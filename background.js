@@ -1,5 +1,7 @@
 "use strict";
 
+const urls = ["https://medium.com/*", "https://*.medium.com/*"];
+
 const extensionApi =
   typeof browser === "object" &&
   typeof browser.runtime === "object" &&
@@ -16,6 +18,10 @@ const extensionApi =
 function unwrapImg(dom) {
   // get the element's parent node
   const img = dom.querySelector("img");
+  if (!img) {
+    removeElement(dom);
+    return;
+  }
   const aspectRatio = `${(img.height / img.width) * 100}%`;
 
   const imgContainer = document.createElement("div");
@@ -40,9 +46,12 @@ function unwrapImg(dom) {
   imgContainer.appendChild(img);
 
   const figCaption = dom.querySelector("figcaption");
-  figCaption.style.textAlign = "center";
-
-  dom.insertBefore(imgContainer, figCaption);
+  if (figCaption) {
+    figCaption.style.textAlign = "center";
+    dom.insertBefore(imgContainer, figCaption);
+  } else {
+    dom.appendChild(imgContainer);
+  }
 }
 
 const domParser = new DOMParser();
@@ -62,9 +71,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
     console.log("details:", details);
 
     let filter = extensionApi.webRequest.filterResponseData(details.requestId);
-    // filter.onstart = (event) => {
-    //   console.log("started");
-    // };
 
     let string = "";
     filter.ondata = (event) => {
@@ -88,6 +94,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       avatar.width = 56;
       avatar.height = 56;
       avatar.style.borderRadius = "50%";
+      // get bigger avatar image for higher resolution
       avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
 
       profile.appendChild(avatar);
@@ -106,7 +113,9 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
       // remove action buttons- share post, bookmark
       removeElement(
-        headline.parentNode.nextElementSibling.querySelector("div")
+        (
+          headline.nextElementSibling || headline.parentNode.nextElementSibling
+        ).querySelector("div")
       );
 
       const allImages = article.querySelectorAll("img:not([srcset])");
@@ -121,7 +130,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
         unwrapImg(img);
       }
 
-      headline.parentNode.parentNode.appendChild(profile);
+      headline.parentNode.insertBefore(profile, headline);
 
       if (article) {
         filter.write(encoder.encode(article.innerHTML));
@@ -131,11 +140,53 @@ extensionApi.webRequest.onBeforeRequest.addListener(
     };
   },
   {
-    urls: ["https://medium.com/*", "https://*.medium.com/*"],
+    urls,
   },
   ["blocking"]
 );
 
 function removeElement(targetedDom) {
   targetedDom && targetedDom.parentNode.removeChild(targetedDom);
+}
+
+/** Bypass medium paywall */
+function getTwitterReferer() {
+  return `https://t.co/${Math.random().toString(36).slice(2)}`;
+}
+
+function onBeforeSendHeaders(details) {
+  if (details.requestHeaders) {
+    let newHeaders = removeHeader(details.requestHeaders, "referer");
+    newHeaders = addHeader(newHeaders, "Referer", getTwitterReferer());
+
+    return { requestHeaders: newHeaders };
+  }
+  return { requestHeaders: details.requestHeaders };
+}
+
+chrome.webRequest.onBeforeSendHeaders.addListener(
+  onBeforeSendHeaders,
+  {
+    urls,
+  },
+  getBeforeSendExtraInfoSpec()
+);
+
+function getBeforeSendExtraInfoSpec() {
+  const extraInfoSpec = ["blocking", "requestHeaders"];
+  if (
+    chrome.webRequest.OnBeforeSendHeadersOptions.hasOwnProperty("EXTRA_HEADERS")
+  ) {
+    extraInfoSpec.push("extraHeaders");
+  }
+  return extraInfoSpec;
+}
+
+function removeHeader(headers, headerToRemove) {
+  return headers.filter(({ name }) => name.toLowerCase() != headerToRemove);
+}
+
+function addHeader(headers, name, value) {
+  headers.push({ name, value });
+  return headers;
 }
