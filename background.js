@@ -15,16 +15,36 @@ const extensionApi =
         'Cannot find extensionApi under namespace "browser" or "chrome"'
       );
 
+let worker;
+if (window.Worker) {
+  worker = new Worker(extensionApi.runtime.getURL("worker.js"));
+
+  worker.onmessage = function (msg) {
+    console.log("Main Script: Message received", msg.data);
+  };
+
+  // let i = 0;
+  // setInterval(() => {
+  //   worker.postMessage({ num: i++ });
+  // }, 500);
+} else {
+  console.log("Worker's not supported :(");
+}
+
+const precedingParagraphIds = [];
 function unwrapImg(dom) {
   // get the element's parent node
   const img = dom.querySelector("img");
+  // TODO: slot for embed
   if (!img) {
-    removeElement(dom);
+    precedingParagraphIds.push(dom.previousElementSibling.id);
     return;
   }
+
   const aspectRatio = `${(img.height / img.width) * 100}%`;
 
   const imgContainer = document.createElement("div");
+  // the 'paddingBottom' trick to avoid content shifting when an image is loaded
   imgContainer.style.paddingBottom = aspectRatio;
   imgContainer.style.position = "relative";
   imgContainer.style.height = "0";
@@ -54,16 +74,19 @@ function unwrapImg(dom) {
   }
 }
 
+let postState = {};
 const domParser = new DOMParser();
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
-// Disable javascript for these sites
+
 extensionApi.webRequest.onBeforeRequest.addListener(
   function (details) {
+    // cancel favicon.ico request
     if (!/.+(?<!\.ico)$/.test(details.url)) {
       return { cancel: true };
     }
 
+    // allow requests for static assets served by medium
     if (/miro.medium.com.+/.test(details.url)) {
       return;
     }
@@ -79,15 +102,24 @@ extensionApi.webRequest.onBeforeRequest.addListener(
     };
 
     filter.onstop = (event) => {
+      // parse DOMString into a DOM tree
       const html = domParser.parseFromString(string, "text/html");
+      let scriptsContent = [];
+      for (const script of html.querySelectorAll("script:not([src])")) {
+        if (script) {
+          scriptsContent.push(script.textContent);
+        }
+      }
 
       const article = html.getElementsByTagName("article")[0];
 
-      // get avatar
+      // create an empty div to contain author info and metadata
       const profile = document.createElement("div");
 
+      // get the element of an article's title
       const headline = article.querySelectorAll("h1")[0];
 
+      // get avatar
       const avatar = (
         headline.nextElementSibling || headline.parentNode.nextElementSibling
       ).querySelector("a img");
@@ -118,6 +150,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
         ).querySelector("div")
       );
 
+      // remove all images' placeholder
       const allImages = article.querySelectorAll("img:not([srcset])");
       for (const img of allImages) {
         removeElement(img);
@@ -130,11 +163,16 @@ extensionApi.webRequest.onBeforeRequest.addListener(
         unwrapImg(img);
       }
 
+      // prepend the profile section to the top of an article
       headline.parentNode.insertBefore(profile, headline);
 
       if (article) {
+        // finally pass it to rendering engine
         filter.write(encoder.encode(article.innerHTML));
       }
+
+      worker.postMessage({ scriptsContent, precedingParagraphIds });
+
       console.log("finished");
       filter.disconnect();
     };
