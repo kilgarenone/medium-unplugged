@@ -50,6 +50,7 @@ onmessage = function ({ data: { scriptsContent, precedingParagraphIds } }) {
         },
      */
     const iframe = state[key].iframe;
+
     if (iframe && iframe.mediaResource && iframe.mediaResource.__ref) {
       const precedingState = state[stateArr[index - 1]];
       mediaSlots.push({

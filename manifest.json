@@ -1,23 +1,24 @@
 {
   "manifest_version": 2,
-  "name": "Borderify",
+  "name": "medium-unplugged",
   "version": "1.0",
-  "description": "Adds a red border to all webpages matching mozilla.org.",
+  "description": "Load Medium articles faster and leaner",
   "icons": {
     "48": "icons/border-48.png"
   },
   "content_scripts": [
     {
-      "all_frames": true,
       "matches": ["https://medium.com/*", "https://*.medium.com/*"],
       "js": ["content.js"],
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ],
   "background": {
     "scripts": ["background.js"]
   },
   "permissions": [
+    "activeTab",
+    "tabs",
     "webRequest",
     "webRequestBlocking",
     "https://medium.com/*",

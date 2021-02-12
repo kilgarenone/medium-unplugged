@@ -15,20 +15,38 @@ const extensionApi =
         'Cannot find extensionApi under namespace "browser" or "chrome"'
       );
 
+browser.runtime.onMessage.addListener(notify);
+
+function onError(error) {
+  console.error(`Error: ${error}`);
+}
+
+function sendMessageToTabs(tabs) {
+  for (let tab of tabs) {
+    browser.tabs
+      .sendMessage(tab.id, { greeting: "Hi from background script" })
+      .then((response) => {
+        console.log("Message from the content script:");
+        console.log(response.response);
+      })
+      .catch(onError);
+  }
+}
+
 let worker;
 if (window.Worker) {
   worker = new Worker(extensionApi.runtime.getURL("worker.js"));
 
   worker.onmessage = function (msg) {
     console.log("Main Script: Message received", msg.data);
+    browser.tabs
+      .query({
+        currentWindow: true,
+        active: true,
+      })
+      .then(sendMessageToTabs)
+      .catch(onError);
   };
-
-  // let i = 0;
-  // setInterval(() => {
-  //   worker.postMessage({ num: i++ });
-  // }, 500);
-} else {
-  console.log("Worker's not supported :(");
 }
 
 const precedingParagraphIds = [];
@@ -78,6 +96,13 @@ let postState = {};
 const domParser = new DOMParser();
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
+let scriptsContent = [];
+
+function notify(e) {
+  worker.postMessage({ scriptsContent, precedingParagraphIds });
+
+  console.log("e:", e);
+}
 
 extensionApi.webRequest.onBeforeRequest.addListener(
   function (details) {
@@ -104,7 +129,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
     filter.onstop = (event) => {
       // parse DOMString into a DOM tree
       const html = domParser.parseFromString(string, "text/html");
-      let scriptsContent = [];
       for (const script of html.querySelectorAll("script:not([src])")) {
         if (script) {
           scriptsContent.push(script.textContent);
@@ -171,8 +195,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
         filter.write(encoder.encode(article.innerHTML));
       }
 
-      worker.postMessage({ scriptsContent, precedingParagraphIds });
-
       console.log("finished");
       filter.disconnect();
     };
@@ -187,7 +209,10 @@ function removeElement(targetedDom) {
   targetedDom && targetedDom.parentNode.removeChild(targetedDom);
 }
 
-/** Bypass medium paywall */
+/**
+ * Bypass medium paywall
+ *
+ */
 function getTwitterReferer() {
   return `https://t.co/${Math.random().toString(36).slice(2)}`;
 }
