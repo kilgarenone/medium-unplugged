@@ -8,8 +8,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://medium.com/*"],
-      "js": ["scrape.js"]
+      "all_frames": true,
+      "matches": ["https://medium.com/*", "https://*.medium.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
     }
   ],
   "background": {
