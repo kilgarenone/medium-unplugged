@@ -58,10 +58,10 @@ onmessage = function ({ data: { scriptsContent, precedingParagraphIds } }) {
           precedingState && precedingParagraphIds.includes(precedingState.name)
             ? precedingState.name
             : null,
-        mediaRefId: iframe.mediaResource.__ref,
+        mediaRefId: iframe.mediaResource.__ref.replace("MediaResource:", ""),
       });
     }
   });
 
-  postMessage({ mediaSlots });
+  postMessage(mediaSlots);
 };

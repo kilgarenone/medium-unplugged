@@ -15,41 +15,50 @@ const extensionApi =
         'Cannot find extensionApi under namespace "browser" or "chrome"'
       );
 
-browser.runtime.onMessage.addListener(notify);
-
 function onError(error) {
   console.error(`Error: ${error}`);
 }
 
-function sendMessageToTabs(tabs) {
+function getActiveTabs() {
+  return browser.tabs.query({
+    currentWindow: true,
+    active: true,
+  });
+}
+let worker;
+function initWorker() {
+  if (window.Worker) {
+    worker = new Worker(extensionApi.runtime.getURL("worker.js"));
+
+    worker.onmessage = function (message) {
+      getActiveTabs()
+        .then((tabs) => sendMessageToTabs(tabs, message.data))
+        .catch(onError);
+    };
+  }
+}
+
+function sendMessageToTabs(tabs, message) {
   for (let tab of tabs) {
     browser.tabs
-      .sendMessage(tab.id, { greeting: "Hi from background script" })
-      .then((response) => {
-        console.log("Message from the content script:");
-        console.log(response.response);
-      })
+      .sendMessage(tab.id, { event: "insert_media", msg: message })
       .catch(onError);
   }
 }
 
-let worker;
-if (window.Worker) {
-  worker = new Worker(extensionApi.runtime.getURL("worker.js"));
-
-  worker.onmessage = function (msg) {
-    console.log("Main Script: Message received", msg.data);
-    browser.tabs
-      .query({
-        currentWindow: true,
-        active: true,
-      })
-      .then(sendMessageToTabs)
-      .catch(onError);
-  };
-}
+initWorker();
 
 const precedingParagraphIds = [];
+let scriptsContent = [];
+
+browser.runtime.onMessage.addListener(handleMessageFromContent);
+
+function handleMessageFromContent({ event }) {
+  if (event === "dom_loaded") {
+    worker.postMessage({ scriptsContent, precedingParagraphIds });
+  }
+}
+
 function unwrapImg(dom) {
   // get the element's parent node
   const img = dom.querySelector("img");
@@ -96,13 +105,6 @@ let postState = {};
 const domParser = new DOMParser();
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
-let scriptsContent = [];
-
-function notify(e) {
-  worker.postMessage({ scriptsContent, precedingParagraphIds });
-
-  console.log("e:", e);
-}
 
 extensionApi.webRequest.onBeforeRequest.addListener(
   function (details) {
@@ -113,6 +115,11 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
     // allow requests for static assets served by medium
     if (/miro.medium.com.+/.test(details.url)) {
+      return;
+    }
+
+    // don't process iframe
+    if (details.type === "sub_frame") {
       return;
     }
 
@@ -128,7 +135,8 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
     filter.onstop = (event) => {
       // parse DOMString into a DOM tree
-      const html = domParser.parseFromString(string, "text/html");
+      // TODO: empty this variable at the end to be good memory citizen?
+      let html = domParser.parseFromString(string, "text/html");
       for (const script of html.querySelectorAll("script:not([src])")) {
         if (script) {
           scriptsContent.push(script.textContent);

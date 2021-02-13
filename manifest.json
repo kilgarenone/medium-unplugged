@@ -23,5 +23,6 @@
     "webRequestBlocking",
     "https://medium.com/*",
     "https://*.medium.com/*"
-  ]
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'"
 }
