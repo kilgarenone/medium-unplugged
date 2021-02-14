@@ -19,52 +19,86 @@ function onError(error) {
   console.error(`Error: ${error}`);
 }
 
-function getActiveTabs() {
-  return browser.tabs.query({
-    currentWindow: true,
-    active: true,
-  });
-}
-let worker;
-function initWorker() {
-  if (window.Worker) {
-    worker = new Worker(extensionApi.runtime.getURL("worker.js"));
+// function getActiveTabs() {
+//   return browser.tabs.query({
+//     currentWindow: true,
+//     active: true,
+//   });
+// }
 
-    worker.onmessage = function (message) {
-      getActiveTabs()
-        .then((tabs) => sendMessageToTabs(tabs, message.data))
-        .catch(onError);
-    };
-  }
-}
+// let hostname = "";
+// let worker;
 
-function sendMessageToTabs(tabs, message) {
-  for (let tab of tabs) {
+// function initWorker() {
+//   if (window.Worker) {
+//     worker = new Worker(extensionApi.runtime.getURL("worker.js"));
+
+//     worker.onmessage = async function (message) {
+//       getActiveTabs()
+//         .then((tabs) => getMediaResourceScript(tabs, message.data))
+//         .catch(onError);
+//     };
+//   }
+// }
+
+// async function getMediaResourceScript(tabs, mediaSlots) {
+//   for (const { mediaRefId, precedingParagraphId } of mediaSlots) {
+//     await fetch(`https://${hostname}/media/${mediaSlots[0].mediaRefId}`)
+//       .then((res) => res.text())
+//       .then((domString) => {
+//         const document = domParser.parseFromString(domString, "text/html");
+//         const script = document.querySelector("script[src]");
+//         sendMessageToTabs(tabs, { precedingParagraphId, src: script.src });
+//       });
+//   }
+// }
+
+// function sendMessageToTabs(tabs, message) {
+//   for (let tab of tabs) {
+//     browser.tabs
+//       .sendMessage(tab.id, { event: "insert_media", msg: message })
+//       .catch(onError);
+//   }
+// }
+
+// initWorker();
+
+const domParser = new DOMParser();
+const ARTICLES_STORE = {};
+
+extensionApi.runtime.onMessage.addListener(handleMessageFromContent);
+
+function handleMessageFromContent(msg, sender) {
+  console.log("sender:", sender);
+  console.log("msg:", msg);
+  if (msg.event === "dom_loaded") {
     browser.tabs
-      .sendMessage(tab.id, { event: "insert_media", msg: message })
+      .sendMessage(sender.tab.id, {
+        event: "insert_media",
+        msg: ARTICLES_STORE[sender.tab.id],
+      })
+      .then(() => delete ARTICLES_STORE[sender.tab.id])
       .catch(onError);
   }
 }
 
-initWorker();
-
-const precedingParagraphIds = [];
-let scriptsContent = [];
-
-browser.runtime.onMessage.addListener(handleMessageFromContent);
-
-function handleMessageFromContent({ event }) {
-  if (event === "dom_loaded") {
-    worker.postMessage({ scriptsContent, precedingParagraphIds });
-  }
+function initArticleState(tabId) {
+  ARTICLES_STORE[tabId] = { precedingParagraphIds: [], scriptsContent: [] };
 }
 
-function unwrapImg(dom) {
-  // get the element's parent node
+function unwrapImg(dom, tabId) {
   const img = dom.querySelector("img");
-  // TODO: slot for embed
+
   if (!img) {
-    precedingParagraphIds.push(dom.previousElementSibling.id);
+    let prevEleSiblingId = dom.previousElementSibling.id;
+    if (!prevEleSiblingId) {
+      prevEleSiblingId = Math.random().toString(36).slice(-6);
+      // give it an id for later dom query
+      dom.previousElementSibling.id = prevEleSiblingId;
+    }
+
+    ARTICLES_STORE[tabId].precedingParagraphIds.push(prevEleSiblingId);
+
     return;
   }
 
@@ -102,7 +136,6 @@ function unwrapImg(dom) {
 }
 
 let postState = {};
-const domParser = new DOMParser();
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 
@@ -118,8 +151,8 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       return;
     }
 
-    // don't process iframe
-    if (details.type === "sub_frame") {
+    // allow mediaResource request in worker.js
+    if (details.type === "xmlhttprequest" && /media\/.+$/.test(details.url)) {
       return;
     }
 
@@ -129,17 +162,17 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
     let string = "";
     filter.ondata = (event) => {
-      let str = decoder.decode(event.data, { stream: true });
-      string += str;
+      string += decoder.decode(event.data, { stream: true });
     };
 
     filter.onstop = (event) => {
+      initArticleState(details.tabId);
       // parse DOMString into a DOM tree
       // TODO: empty this variable at the end to be good memory citizen?
       let html = domParser.parseFromString(string, "text/html");
       for (const script of html.querySelectorAll("script:not([src])")) {
         if (script) {
-          scriptsContent.push(script.textContent);
+          ARTICLES_STORE[details.tabId].scriptsContent.push(script.textContent);
         }
       }
 
@@ -192,7 +225,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       const allImagesWithSrcSet = article.querySelectorAll("figure");
 
       for (const img of allImagesWithSrcSet) {
-        unwrapImg(img);
+        unwrapImg(img, details.tabId);
       }
 
       // prepend the profile section to the top of an article

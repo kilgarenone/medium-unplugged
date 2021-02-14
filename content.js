@@ -11,39 +11,52 @@ const extensionApi =
         'Cannot find extensionApi under namespace "browser" or "chrome"'
       );
 
+const worker = new Worker(extensionApi.runtime.getURL("worker.js"));
+worker.onmessage = (e) => {
+  window.console.log(e);
+};
+
 window.addEventListener("DOMContentLoaded", initOnDomReady, false);
 
-function initOnDomReady() {
-  browser.runtime.sendMessage({ event: "dom_loaded" });
-  browser.runtime.onMessage.addListener((payload) => {
-    console.log("Message from the background script:");
-    console.log(payload);
-    if (payload.event === "insert_media") {
-      for (const { precedingParagraphId, mediaRefId } of payload.msg) {
-        const iFrame = document.createElement("iframe");
-        iFrame.src = `https://yitaek.medium.com/media/${mediaRefId}`;
-        iFrame.setAttribute("frameborder", "0");
-        iFrame.style.width = "100%";
-        iFrame.addEventListener("load", function () {
-          // console.log(parent);
-          // iFrame.width = iFrame.contentWindow.document.body.scrollWidth;
-          // iFrame.height = iFrame.contentWindow.document.body.scrollHeight;
-          // iFrame.style.height = "100%";
-        });
-        const precedingParagraphEle = document.getElementById(
-          precedingParagraphId
-        );
-        if (precedingParagraphEle) {
-          precedingParagraphEle.parentNode.insertBefore(
-            iFrame,
-            precedingParagraphEle.nextSibling
-          );
-        }
-      }
-    }
-  });
-}
+// extensionApi.runtime.sendMessage({
+//   event: "dom_loaded",
+//   host: window.location.hostname,
+// });
 
-window._resizeIframe = function (obj) {
-  console.log("obj:", obj);
-};
+function initOnDomReady() {
+  // console.log("tab:");
+  // extensionApi.tabs
+  //   .getCurrent()
+  //   .then((tab) => console.log(tab))
+  //   .catch((err) => console.log(err));
+
+  // console.log("tab:", tab);
+
+  extensionApi.runtime.sendMessage({
+    event: "dom_loaded",
+    // tabId: tab[0].id,
+  });
+
+  extensionApi.runtime.onMessage.addListener((payload) => {
+    console.log("payload:", payload);
+  });
+  // extensionApi.runtime.onMessage.addListener((payload) => {
+  //   console.log("Message from the background script:");
+  //   if (payload.event === "insert_media") {
+  //     console.log(payload.msg);
+  //     const { precedingParagraphId, src } = payload.msg;
+
+  //     const script = document.createElement("iframe");
+  //     script.src = src;
+  //     const precedingParagraphEle = document.getElementById(
+  //       precedingParagraphId
+  //     );
+  //     if (precedingParagraphEle) {
+  //       precedingParagraphEle.parentNode.insertBefore(
+  //         script,
+  //         precedingParagraphEle.nextSibling
+  //       );
+  //     }
+  //   }
+  // });
+}

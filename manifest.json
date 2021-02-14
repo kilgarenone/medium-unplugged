@@ -24,5 +24,5 @@
     "https://medium.com/*",
     "https://*.medium.com/*"
   ],
-  "content_security_policy": "script-src 'self'; object-src 'self'"
+  "web_accessible_resources": ["worker.js"]
 }
