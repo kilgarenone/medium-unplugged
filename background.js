@@ -69,12 +69,10 @@ const ARTICLES_STORE = {};
 extensionApi.runtime.onMessage.addListener(handleMessageFromContent);
 
 function handleMessageFromContent(msg, sender) {
-  console.log("sender:", sender);
-  console.log("msg:", msg);
   if (msg.event === "dom_loaded") {
     browser.tabs
       .sendMessage(sender.tab.id, {
-        event: "insert_media",
+        event: "get_article_model",
         msg: ARTICLES_STORE[sender.tab.id],
       })
       .then(() => delete ARTICLES_STORE[sender.tab.id])
@@ -83,22 +81,15 @@ function handleMessageFromContent(msg, sender) {
 }
 
 function initArticleState(tabId) {
-  ARTICLES_STORE[tabId] = { precedingParagraphIds: [], scriptsContent: [] };
+  ARTICLES_STORE[tabId] = { containerId: [], scriptsContent: [], metadata: {} };
 }
 
 function unwrapImg(dom, tabId) {
   const img = dom.querySelector("img");
 
-  if (!img) {
-    let prevEleSiblingId = dom.previousElementSibling.id;
-    if (!prevEleSiblingId) {
-      prevEleSiblingId = Math.random().toString(36).slice(-6);
-      // give it an id for later dom query
-      dom.previousElementSibling.id = prevEleSiblingId;
-    }
-
-    ARTICLES_STORE[tabId].precedingParagraphIds.push(prevEleSiblingId);
-
+  if (!img && !dom.id) {
+    dom.id = Math.random().toString(36).slice(-6);
+    ARTICLES_STORE[tabId].containerId.push(dom.id);
     return;
   }
 
@@ -170,10 +161,21 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // parse DOMString into a DOM tree
       // TODO: empty this variable at the end to be good memory citizen?
       let html = domParser.parseFromString(string, "text/html");
-      for (const script of html.querySelectorAll("script:not([src])")) {
+      for (const script of html.querySelectorAll(
+        "script:not([src]):not([type])"
+      )) {
         if (script) {
           ARTICLES_STORE[details.tabId].scriptsContent.push(script.textContent);
         }
+      }
+
+      const metadata = html.querySelector('script[type="application/ld+json"]');
+      try {
+        ARTICLES_STORE[details.tabId].metadata = JSON.parse(
+          metadata.textContent
+        );
+      } catch (error) {
+        console.error("Error parsing post metadata script content", error);
       }
 
       const article = html.getElementsByTagName("article")[0];

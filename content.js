@@ -1,3 +1,5 @@
+const domParser = new DOMParser();
+
 const extensionApi =
   typeof browser === "object" &&
   typeof browser.runtime === "object" &&
@@ -12,8 +14,24 @@ const extensionApi =
       );
 
 const worker = new Worker(extensionApi.runtime.getURL("worker.js"));
-worker.onmessage = (e) => {
-  window.console.log(e);
+
+worker.onmessage = async ({ data }) => {
+  console.log("data:", data);
+
+  // if (data.event === "insert_media") {
+  //   for (const { iFrameSrc, mediaRefId } of data.msg) {
+  //     if (!iFrameSrc) {
+  //       await fetch(`https://${window.location.hostname}/media/${mediaRefId}`)
+  //         .then((res) => res.text())
+  //         .then((domString) => {
+  //           const document = domParser.parseFromString(domString, "text/html");
+  //           const script = document.querySelector("script[src]");
+  //           console.log("script:", script);
+  //           // sendMessageToTabs(tabs, { precedingParagraphId, src: script.src });
+  //         });
+  //     }
+  //   }
+  // }
 };
 
 window.addEventListener("DOMContentLoaded", initOnDomReady, false);
@@ -37,8 +55,10 @@ function initOnDomReady() {
     // tabId: tab[0].id,
   });
 
-  extensionApi.runtime.onMessage.addListener((payload) => {
-    console.log("payload:", payload);
+  extensionApi.runtime.onMessage.addListener(({ event, msg }) => {
+    if (event === "get_article_model") {
+      worker.postMessage(msg);
+    }
   });
   // extensionApi.runtime.onMessage.addListener((payload) => {
   //   console.log("Message from the background script:");

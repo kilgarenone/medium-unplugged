@@ -1,4 +1,4 @@
-onmessage = function ({ data: { scriptsContent, precedingParagraphIds } }) {
+onmessage = function ({ data: { scriptsContent, metadata } }) {
   let state = {};
 
   for (let i = scriptsContent.length - 1; i >= 0; i--) {
@@ -14,54 +14,64 @@ onmessage = function ({ data: { scriptsContent, precedingParagraphIds } }) {
     }
   }
 
+  const postObj = state[`Post:${metadata.identifier}`];
+  let paragraphs = {};
+
+  for (const key in postObj) {
+    if (/content\(/.test(key)) {
+      paragraphs = postObj[key].bodyModel.paragraphs;
+    }
+  }
+  postMessage(paragraphs);
+  // console.log("postModel:", postModel);
   /**
    * mediaSlots's type
    * [{precedingParagraphId: String, mediaRefId: String}]
    */
-  const mediaSlots = [];
+  // const mediaSlots = [];
 
   /**
    * stateArr's type
    * ["Paragraph:977ef336c448_51", "Paragraph:977ef336c448_51"]
    */
-  const stateArr = Object.keys(state);
+  // const stateArr = Object.keys(state);
 
-  stateArr.forEach((key, index) => {
-    /** iframe's type
-     *  {
-          id: "977ef336c448_52",
-          __typename: "Paragraph",
-          name: "b032",
-          text: "",
-          type: "IFRAME",
-          href: null,
-          layout: "INSET_CENTER",
-          metadata: null,
-          hasDropCap: null,
-          iframe: {
-            __typename: "Iframe",
-            mediaResource: {
-              __ref: "MediaResource:c59b259898064780275173ffbf197808",
-            },
-          },
-          mixtapeMetadata: null,
-          markups: [],
-          dropCapImage: null,
-        },
-     */
-    const iframe = state[key].iframe;
+  // stateArr.forEach((key, index) => {
+  //   /** iframe's type
+  //    *  {
+  //         id: "977ef336c448_52",
+  //         __typename: "Paragraph",
+  //         name: "b032",
+  //         text: "",
+  //         type: "IFRAME",
+  //         href: null,
+  //         layout: "INSET_CENTER",
+  //         metadata: null,
+  //         hasDropCap: null,
+  //         iframe: {
+  //           __typename: "Iframe",
+  //           mediaResource: {
+  //             __ref: "MediaResource:c59b259898064780275173ffbf197808",
+  //           },
+  //         },
+  //         mixtapeMetadata: null,
+  //         markups: [],
+  //         dropCapImage: null,
+  //       },
+  //    */
+  //   const iframe = state[key].iframe;
 
-    if (iframe && iframe.mediaResource && iframe.mediaResource.__ref) {
-      const precedingState = state[stateArr[index - 1]];
-      mediaSlots.push({
-        precedingParagraphId:
-          precedingState && precedingParagraphIds.includes(precedingState.name)
-            ? precedingState.name
-            : null,
-        mediaRefId: iframe.mediaResource.__ref.replace("MediaResource:", ""),
-      });
-    }
-  });
-
-  postMessage(mediaSlots);
+  //   if (iframe && iframe.mediaResource && iframe.mediaResource.__ref) {
+  //     const precedingState = state[stateArr[index - 1]];
+  //     const iFrameSrc = state[iframe.mediaResource.__ref].iframeSrc;
+  //     mediaSlots.push({
+  //       precedingParagraphId:
+  //         precedingState && containerId.includes(precedingState.name)
+  //           ? precedingState.name
+  //           : null,
+  //       mediaRefId: iframe.mediaResource.__ref.replace("MediaResource:", ""),
+  //       iFrameSrc,
+  //     });
+  //   }
+  // });
 };
