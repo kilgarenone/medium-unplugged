@@ -57,7 +57,7 @@ function initOnDomReady() {
 
   extensionApi.runtime.onMessage.addListener(({ event, msg }) => {
     if (event === "get_article_model") {
-      worker.postMessage(msg);
+      worker.postMessage({ msg, hostname: window.location.hostname });
     }
   });
   // extensionApi.runtime.onMessage.addListener((payload) => {

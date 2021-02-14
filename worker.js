@@ -1,4 +1,9 @@
-onmessage = function ({ data: { scriptsContent, metadata } }) {
+onmessage = function ({
+  data: {
+    msg: { scriptsContent, metadata },
+    hostname,
+  },
+}) {
   let state = {};
 
   for (let i = scriptsContent.length - 1; i >= 0; i--) {
@@ -15,14 +20,32 @@ onmessage = function ({ data: { scriptsContent, metadata } }) {
   }
 
   const postObj = state[`Post:${metadata.identifier}`];
-  let paragraphs = {};
+  let paragraphs = [];
 
   for (const key in postObj) {
     if (/content\(/.test(key)) {
       paragraphs = postObj[key].bodyModel.paragraphs;
+      break;
     }
   }
-  postMessage(paragraphs);
+
+  const mediaSlots = [];
+  paragraphs.forEach(({ __ref: paragraphRefId }, index) => {
+    const paragraph = state[paragraphRefId];
+
+    if (!paragraph || !paragraph.iframe) return;
+
+    const mediaResourceId = paragraph.iframe.mediaResource.__ref;
+    const iFrameSrc =
+      state[mediaResourceId].iframeSrc ||
+      `https://${hostname}/media/${mediaResourceId.replace(
+        "MediaResource:",
+        ""
+      )}`;
+    mediaSlots.push({ iFrameSrc, childOrder: index });
+  });
+
+  postMessage(mediaSlots);
   // console.log("postModel:", postModel);
   /**
    * mediaSlots's type

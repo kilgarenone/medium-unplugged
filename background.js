@@ -129,6 +129,7 @@ function unwrapImg(dom, tabId) {
 let postState = {};
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
+const ARTICLE_ID = "medium-unplugged-article";
 
 extensionApi.webRequest.onBeforeRequest.addListener(
   function (details) {
@@ -186,6 +187,9 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // get the element of an article's title
       const headline = article.querySelectorAll("h1")[0];
 
+      // set an id to a parent to be queried for its child later
+      headline.parentNode.parentNode.id = ARTICLE_ID;
+
       // get avatar
       const avatar = (
         headline.nextElementSibling || headline.parentNode.nextElementSibling
@@ -233,6 +237,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // prepend the profile section to the top of an article
       headline.parentNode.insertBefore(profile, headline);
 
+      console.log("article:", html.getElementById(ARTICLE_ID).childNodes);
       if (article) {
         // finally pass it to rendering engine
         filter.write(encoder.encode(article.innerHTML));
