@@ -81,15 +81,13 @@ function handleMessageFromContent(msg, sender) {
 }
 
 function initArticleState(tabId) {
-  ARTICLES_STORE[tabId] = { containerId: [], scriptsContent: [], metadata: {} };
+  ARTICLES_STORE[tabId] = { scriptsContent: [], metadata: {} };
 }
 
 function unwrapImg(dom, tabId) {
   const img = dom.querySelector("img");
 
-  if (!img && !dom.id) {
-    dom.id = Math.random().toString(36).slice(-6);
-    ARTICLES_STORE[tabId].containerId.push(dom.id);
+  if (!img) {
     return;
   }
 
@@ -129,7 +127,7 @@ function unwrapImg(dom, tabId) {
 let postState = {};
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
-const ARTICLE_ID = "medium-unplugged-article";
+// const ARTICLE_ID = "medium-unplugged-article";
 
 extensionApi.webRequest.onBeforeRequest.addListener(
   function (details) {
@@ -188,7 +186,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       const headline = article.querySelectorAll("h1")[0];
 
       // set an id to a parent to be queried for its child later
-      headline.parentNode.parentNode.id = ARTICLE_ID;
+      // headline.parentNode.parentNode.id = ARTICLE_ID;
 
       // get avatar
       const avatar = (
@@ -237,7 +235,16 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // prepend the profile section to the top of an article
       headline.parentNode.insertBefore(profile, headline);
 
-      console.log("article:", html.getElementById(ARTICLE_ID).childNodes);
+      article.querySelectorAll("section").forEach((section) => {
+        if (!section.childNodes.length) return;
+        section
+          .querySelector("div > div")
+          .childNodes.forEach((node) => node.classList.add("mu-paragraph"));
+      });
+      console.log(
+        "article:",
+        Array.from(html.getElementsByClassName("mu-paragraph"))
+      );
       if (article) {
         // finally pass it to rendering engine
         filter.write(encoder.encode(article.innerHTML));

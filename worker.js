@@ -19,7 +19,35 @@ onmessage = function ({
     }
   }
 
+  /**
+   *    {
+          id: "bce68a9dee7",
+          __typename: "Post",
+          canonicalUrl: "",
+          collection: null,
+          'content({"postMeteringOptions":{"referrer":"https:\u002F\u002Ft.co\u002Fllu1mj1ukzq"}})': {
+            __typename: "PostContent",
+            isLockedPreviewOnly: false,
+            validatedShareKey: "",
+            isCacheableContent: false,
+            bodyModel: {
+              __typename: "RichText",
+              paragraphs: [
+                { __ref: "Paragraph:f0aed8bbd7a1_0" },
+                { __ref: "Paragraph:f0aed8bbd7a1_1" },
+              ]
+            }
+          }
+        }
+   */
   const postObj = state[`Post:${metadata.identifier}`];
+  /**
+   * [
+        { __ref: "Paragraph:f0aed8bbd7a1_0" },
+        { __ref: "Paragraph:f0aed8bbd7a1_1" },
+        { __ref: "Paragraph:f0aed8bbd7a1_2" },
+      ]
+   */
   let paragraphs = [];
 
   for (const key in postObj) {
@@ -29,23 +57,35 @@ onmessage = function ({
     }
   }
 
-  const mediaSlots = [];
-  paragraphs.forEach(({ __ref: paragraphRefId }, index) => {
-    const paragraph = state[paragraphRefId];
+  const childs = paragraphs.filter(({ __ref: paragraphRef }, index) => {
+    if (index === 0) return true;
 
-    if (!paragraph || !paragraph.iframe) return;
+    if (/^(P|IMG|H\d|IFRAME)$/.test(state[paragraphRef].type)) return true;
 
-    const mediaResourceId = paragraph.iframe.mediaResource.__ref;
-    const iFrameSrc =
-      state[mediaResourceId].iframeSrc ||
-      `https://${hostname}/media/${mediaResourceId.replace(
-        "MediaResource:",
-        ""
-      )}`;
-    mediaSlots.push({ iFrameSrc, childOrder: index });
+    if (state[paragraphRef].type === state[paragraphs[index - 1].__ref].type) {
+      return false;
+    }
+
+    return true;
   });
 
-  postMessage(mediaSlots);
+  // const mediaSlots = [];
+  // paragraphs.forEach(({ __ref: paragraphRefId }, index) => {
+  //   const paragraph = state[paragraphRefId];
+
+  //   if (!paragraph || !paragraph.iframe) return;
+
+  //   const mediaResourceId = paragraph.iframe.mediaResource.__ref;
+  //   const iFrameSrc =
+  //     state[mediaResourceId].iframeSrc ||
+  //     `https://${hostname}/media/${mediaResourceId.replace(
+  //       "MediaResource:",
+  //       ""
+  //     )}`;
+  //   mediaSlots.push({ iFrameSrc, childOrder: index });
+  // });
+
+  postMessage(childs);
   // console.log("postModel:", postModel);
   /**
    * mediaSlots's type
