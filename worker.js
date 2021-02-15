@@ -1,3 +1,5 @@
+"use strict";
+
 onmessage = function ({
   data: {
     msg: { scriptsContent, metadata },
@@ -76,13 +78,19 @@ onmessage = function ({
     if (!paragraph || !paragraph.iframe) return;
 
     const mediaResourceId = paragraph.iframe.mediaResource.__ref;
+    const mediaResource = state[mediaResourceId];
     const iFrameSrc =
-      state[mediaResourceId].iframeSrc ||
+      mediaResource.iframeSrc ||
       `https://${hostname}/media/${mediaResourceId.replace(
         "MediaResource:",
         ""
       )}`;
-    mediaSlots.push({ iFrameSrc, order: index });
+    mediaSlots.push({
+      iFrameSrc,
+      order: index,
+      height: mediaResource.iframeHeight,
+      width: mediaResource.iframeWidth,
+    });
   });
 
   postMessage(mediaSlots);

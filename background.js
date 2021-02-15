@@ -19,50 +19,6 @@ function onError(error) {
   console.error(`Error: ${error}`);
 }
 
-// function getActiveTabs() {
-//   return browser.tabs.query({
-//     currentWindow: true,
-//     active: true,
-//   });
-// }
-
-// let hostname = "";
-// let worker;
-
-// function initWorker() {
-//   if (window.Worker) {
-//     worker = new Worker(extensionApi.runtime.getURL("worker.js"));
-
-//     worker.onmessage = async function (message) {
-//       getActiveTabs()
-//         .then((tabs) => getMediaResourceScript(tabs, message.data))
-//         .catch(onError);
-//     };
-//   }
-// }
-
-// async function getMediaResourceScript(tabs, mediaSlots) {
-//   for (const { mediaRefId, precedingParagraphId } of mediaSlots) {
-//     await fetch(`https://${hostname}/media/${mediaSlots[0].mediaRefId}`)
-//       .then((res) => res.text())
-//       .then((domString) => {
-//         const document = domParser.parseFromString(domString, "text/html");
-//         const script = document.querySelector("script[src]");
-//         sendMessageToTabs(tabs, { precedingParagraphId, src: script.src });
-//       });
-//   }
-// }
-
-// function sendMessageToTabs(tabs, message) {
-//   for (let tab of tabs) {
-//     browser.tabs
-//       .sendMessage(tab.id, { event: "insert_media", msg: message })
-//       .catch(onError);
-//   }
-// }
-
-// initWorker();
-
 const domParser = new DOMParser();
 const ARTICLES_STORE = {};
 
@@ -91,7 +47,7 @@ function unwrapImg(dom, tabId) {
     return;
   }
 
-  const aspectRatio = `${(img.height / img.width) * 100}%`;
+  const aspectRatio = `${((img.height / img.width) * 100).toPrecision(4)}%`;
 
   const imgContainer = document.createElement("div");
   // the 'paddingBottom' trick to avoid content shifting when an image is loaded
@@ -200,17 +156,19 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
       profile.appendChild(avatar);
 
+      // TODO: authorName in medium.com/lalala domain is different ele
       const h4 = article.querySelectorAll("h4");
       // get author name
       const authorName = h4[0];
-      profile.appendChild(authorName);
+      console.log("authorName:", authorName);
+      authorName && profile.appendChild(authorName);
 
       // get post's metadata- timestamp and duration of reading
       const postMetadata = h4[1];
       // remove svg inside metadata(that 'featured' star)
-      removeElement(postMetadata.querySelector("svg"));
+      postMetadata && removeElement(postMetadata.querySelector("svg"));
 
-      profile.appendChild(postMetadata);
+      postMetadata && profile.appendChild(postMetadata);
 
       // remove action buttons- share post, bookmark
       removeElement(
@@ -227,7 +185,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
       // get post's images and unwrap them from the noscript tag
       const allImagesWithSrcSet = article.querySelectorAll("figure");
-
       for (const img of allImagesWithSrcSet) {
         unwrapImg(img, details.tabId);
       }
@@ -235,20 +192,21 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // prepend the profile section to the top of an article
       headline.parentNode.insertBefore(profile, headline);
 
+      // remove the <section/> used to contain 'you have red 3 article this month...'
+      removeElement(article.firstElementChild);
+
       article.querySelectorAll("section").forEach((section) => {
-        if (!section.childNodes.length) return;
         section
           .querySelector("div > div")
           .childNodes.forEach((node) => node.classList.add("mu-paragraph"));
       });
-      console.log(
-        "article:",
-        Array.from(html.getElementsByClassName("mu-paragraph"))
-      );
-      if (article) {
-        // finally pass it to rendering engine
-        filter.write(encoder.encode(article.innerHTML));
-      }
+      // console.log(
+      //   "article:",
+      //   Array.from(html.getElementsByClassName("mu-paragraph"))
+      // );
+
+      // finally pass it to rendering engine
+      filter.write(encoder.encode(article.innerHTML));
 
       console.log("finished");
       filter.disconnect();

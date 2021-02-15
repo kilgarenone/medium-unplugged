@@ -1,3 +1,5 @@
+"use strict";
+
 const domParser = new DOMParser();
 
 const extensionApi =
@@ -15,14 +17,28 @@ const extensionApi =
 
 const worker = new Worker(extensionApi.runtime.getURL("worker.js"));
 
-window.addEventListener("message", (message) => {
-  console.log("message:", message);
-  // if (message.source !== childWindow) {
-  //   return; // Skip message in this event listener
-  // }
+// https://docs.embed.ly/v1.0/docs/native
+window.addEventListener("message", function (e) {
+  if (data.context !== "iframe.resize") return false;
 
-  // ...
+  let data;
+  try {
+    data = JSON.parse(e.data);
+  } catch (e) {
+    return false;
+  }
+
+  const iframe = document.querySelector('iframe[src="' + data.src + '"]');
+
+  if (!iframe || !data.height) return false;
+
+  iframe.height = data.height;
+
+  // Update the responsive div.
+  iframe.parentNode.style.paddingBottom =
+    ((data.height / iframe.offsetWidth) * 100).toPrecision(4) + "%";
 });
+
 worker.onmessage = async ({ data }) => {
   console.log("data:", data);
 
@@ -30,14 +46,27 @@ worker.onmessage = async ({ data }) => {
     document.getElementsByClassName("mu-paragraph")
   );
 
-  data.forEach(({ iFrameSrc, order }) => {
+  data.forEach(({ iFrameSrc, order, height, width }) => {
     const iframe = document.createElement("iframe");
     iframe.src = iFrameSrc;
+    iframe.width = width;
+    iframe.height = height;
+    iframe.style.position = "absolute";
     iframe.style.width = "100%";
     iframe.style.height = "100%";
+    iframe.style.top = 0;
+    iframe.style.left = 0;
+
+    paragraphs[order].style.height = 0;
+    paragraphs[order].style.position = "relative";
+    paragraphs[order].style.overflow = "hidden";
+    paragraphs[order].style.paddingBottom = `${(
+      (height / width) *
+      100
+    ).toPrecision(4)}%`;
     iframe.setAttribute("frameborder", 0);
+
     paragraphs[order].appendChild(iframe);
-    iframe.addEventListener("load", function () {});
   });
   // if (data.event === "insert_media") {
   //   for (const { iFrameSrc, mediaRefId } of data.msg) {
