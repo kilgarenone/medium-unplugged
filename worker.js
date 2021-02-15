@@ -57,7 +57,7 @@ onmessage = function ({
     }
   }
 
-  const childs = paragraphs.filter(({ __ref: paragraphRef }, index) => {
+  paragraphs = paragraphs.filter(({ __ref: paragraphRef }, index) => {
     if (index === 0) return true;
 
     if (/^(P|IMG|H\d|IFRAME)$/.test(state[paragraphRef].type)) return true;
@@ -69,23 +69,23 @@ onmessage = function ({
     return true;
   });
 
-  // const mediaSlots = [];
-  // paragraphs.forEach(({ __ref: paragraphRefId }, index) => {
-  //   const paragraph = state[paragraphRefId];
+  const mediaSlots = [];
+  paragraphs.forEach(({ __ref: paragraphRefId }, index) => {
+    const paragraph = state[paragraphRefId];
 
-  //   if (!paragraph || !paragraph.iframe) return;
+    if (!paragraph || !paragraph.iframe) return;
 
-  //   const mediaResourceId = paragraph.iframe.mediaResource.__ref;
-  //   const iFrameSrc =
-  //     state[mediaResourceId].iframeSrc ||
-  //     `https://${hostname}/media/${mediaResourceId.replace(
-  //       "MediaResource:",
-  //       ""
-  //     )}`;
-  //   mediaSlots.push({ iFrameSrc, childOrder: index });
-  // });
+    const mediaResourceId = paragraph.iframe.mediaResource.__ref;
+    const iFrameSrc =
+      state[mediaResourceId].iframeSrc ||
+      `https://${hostname}/media/${mediaResourceId.replace(
+        "MediaResource:",
+        ""
+      )}`;
+    mediaSlots.push({ iFrameSrc, childOrder: index });
+  });
 
-  postMessage(childs);
+  postMessage(mediaSlots);
   // console.log("postModel:", postModel);
   /**
    * mediaSlots's type
