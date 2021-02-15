@@ -15,9 +15,30 @@ const extensionApi =
 
 const worker = new Worker(extensionApi.runtime.getURL("worker.js"));
 
+window.addEventListener("message", (message) => {
+  console.log("message:", message);
+  // if (message.source !== childWindow) {
+  //   return; // Skip message in this event listener
+  // }
+
+  // ...
+});
 worker.onmessage = async ({ data }) => {
   console.log("data:", data);
 
+  const paragraphs = Array.from(
+    document.getElementsByClassName("mu-paragraph")
+  );
+
+  data.forEach(({ iFrameSrc, order }) => {
+    const iframe = document.createElement("iframe");
+    iframe.src = iFrameSrc;
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.setAttribute("frameborder", 0);
+    paragraphs[order].appendChild(iframe);
+    iframe.addEventListener("load", function () {});
+  });
   // if (data.event === "insert_media") {
   //   for (const { iFrameSrc, mediaRefId } of data.msg) {
   //     if (!iFrameSrc) {
@@ -36,23 +57,9 @@ worker.onmessage = async ({ data }) => {
 
 window.addEventListener("DOMContentLoaded", initOnDomReady, false);
 
-// extensionApi.runtime.sendMessage({
-//   event: "dom_loaded",
-//   host: window.location.hostname,
-// });
-
 function initOnDomReady() {
-  // console.log("tab:");
-  // extensionApi.tabs
-  //   .getCurrent()
-  //   .then((tab) => console.log(tab))
-  //   .catch((err) => console.log(err));
-
-  // console.log("tab:", tab);
-
   extensionApi.runtime.sendMessage({
     event: "dom_loaded",
-    // tabId: tab[0].id,
   });
 
   extensionApi.runtime.onMessage.addListener(({ event, msg }) => {
@@ -60,23 +67,4 @@ function initOnDomReady() {
       worker.postMessage({ msg, hostname: window.location.hostname });
     }
   });
-  // extensionApi.runtime.onMessage.addListener((payload) => {
-  //   console.log("Message from the background script:");
-  //   if (payload.event === "insert_media") {
-  //     console.log(payload.msg);
-  //     const { precedingParagraphId, src } = payload.msg;
-
-  //     const script = document.createElement("iframe");
-  //     script.src = src;
-  //     const precedingParagraphEle = document.getElementById(
-  //       precedingParagraphId
-  //     );
-  //     if (precedingParagraphEle) {
-  //       precedingParagraphEle.parentNode.insertBefore(
-  //         script,
-  //         precedingParagraphEle.nextSibling
-  //       );
-  //     }
-  //   }
-  // });
 }
