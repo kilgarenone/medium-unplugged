@@ -88,8 +88,8 @@ onmessage = function ({
     mediaSlots.push({
       iFrameSrc,
       order: index,
-      height: mediaResource.iframeHeight,
-      width: mediaResource.iframeWidth,
+      height: mediaResource.iframeHeight || 77, // 77 min height for gist
+      width: mediaResource.iframeWidth || 340,
     });
   });
 

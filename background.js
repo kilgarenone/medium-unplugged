@@ -47,11 +47,12 @@ function unwrapImg(dom, tabId) {
     return;
   }
 
-  const aspectRatio = `${((img.height / img.width) * 100).toPrecision(4)}%`;
-
   const imgContainer = document.createElement("div");
   // the 'paddingBottom' trick to avoid content shifting when an image is loaded
-  imgContainer.style.paddingBottom = aspectRatio;
+  imgContainer.style.paddingBottom = `${(
+    (img.height / img.width) *
+    100
+  ).toPrecision(4)}%`;
   imgContainer.style.position = "relative";
   imgContainer.style.height = "0";
   imgContainer.style.marginBottom = "10px";
@@ -125,6 +126,14 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       }
 
       const metadata = html.querySelector('script[type="application/ld+json"]');
+      const article = html.getElementsByTagName("article")[0];
+
+      // TODO: proper filter out request at upper-level
+      if (!article || !metadata) {
+        filter.disconnect();
+        return;
+      }
+
       try {
         ARTICLES_STORE[details.tabId].metadata = JSON.parse(
           metadata.textContent
@@ -132,8 +141,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       } catch (error) {
         console.error("Error parsing post metadata script content", error);
       }
-
-      const article = html.getElementsByTagName("article")[0];
 
       // create an empty div to contain author info and metadata
       const profile = document.createElement("div");
@@ -151,6 +158,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       avatar.width = 56;
       avatar.height = 56;
       avatar.style.borderRadius = "50%";
+
       // get bigger avatar image for higher resolution
       avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
 
@@ -189,21 +197,21 @@ extensionApi.webRequest.onBeforeRequest.addListener(
         unwrapImg(img, details.tabId);
       }
 
-      // prepend the profile section to the top of an article
-      headline.parentNode.insertBefore(profile, headline);
-
       // remove the <section/> used to contain 'you have red 3 article this month...'
       removeElement(article.firstElementChild);
 
       article.querySelectorAll("section").forEach((section) => {
         section
           .querySelector("div > div")
-          .childNodes.forEach((node) => node.classList.add("mu-paragraph"));
+          .childNodes.forEach((node) => node.classList.add("mu-p"));
       });
       // console.log(
       //   "article:",
-      //   Array.from(html.getElementsByClassName("mu-paragraph"))
+      //   Array.from(html.getElementsByClassName("mu-p"))
       // );
+
+      // prepend the profile section to the top of an article
+      headline.parentNode.insertBefore(profile, headline);
 
       // finally pass it to rendering engine
       filter.write(encoder.encode(article.innerHTML));

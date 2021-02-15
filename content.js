@@ -39,21 +39,38 @@ window.addEventListener("message", function (e) {
     ((data.height / iframe.offsetWidth) * 100).toPrecision(4) + "%";
 });
 
+const config = {
+  root: null, // avoiding 'root' or setting it to 'null' sets it to default value: viewport
+  rootMargin: "0px", // no margin around our capturing frame(viewport in this case)
+  threshold: 0.5, // when half of a target has intersected
+};
+const observer = new IntersectionObserver(function (entries, self) {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.dataset.isLeaving = true;
+      // TODO: add some kinda spinner while loading
+      entry.target.src = entry.target.getAttribute("data-src");
+    } else if (entry.target.dataset.isLeaving) {
+      self.unobserve(entry.target);
+    }
+  });
+}, config);
+
 worker.onmessage = async ({ data }) => {
   console.log("data:", data);
 
-  const paragraphs = Array.from(
-    document.getElementsByClassName("mu-paragraph")
-  );
+  const paragraphs = Array.from(document.getElementsByClassName("mu-p"));
 
   data.forEach(({ iFrameSrc, order, height, width }) => {
     const iframe = document.createElement("iframe");
-    iframe.src = iFrameSrc;
+    iframe.setAttribute("data-src", iFrameSrc);
     iframe.width = width;
     iframe.height = height;
     iframe.style.position = "absolute";
     iframe.style.width = "100%";
+
     iframe.style.height = "100%";
+    // iframe.style.minHeight = "100px";
     iframe.style.top = 0;
     iframe.style.left = 0;
 
@@ -65,6 +82,8 @@ worker.onmessage = async ({ data }) => {
       100
     ).toPrecision(4)}%`;
     iframe.setAttribute("frameborder", 0);
+
+    observer.observe(iframe);
 
     paragraphs[order].appendChild(iframe);
   });
