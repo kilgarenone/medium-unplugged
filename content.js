@@ -15,6 +15,10 @@ const extensionApi =
         'Cannot find extensionApi under namespace "browser" or "chrome"'
       );
 
+function onError(error) {
+  console.error(`Error in content: ${error}`);
+}
+
 const worker = new Worker(extensionApi.runtime.getURL("worker.js"));
 
 // https://docs.embed.ly/v1.0/docs/native
@@ -49,19 +53,51 @@ const observer = new IntersectionObserver(function (entries, self) {
     if (entry.isIntersecting) {
       entry.target.dataset.isLeaving = true;
       // TODO: add some kinda spinner while loading
-      entry.target.src = entry.target.getAttribute("data-src");
+      const mediaRef = entry.target.dataset.ref;
+      if (mediaRef) {
+        fetch(mediaRef).then(handleMediaRefResults).catch(onError);
+      } else {
+        entry.target.src = entry.target.getAttribute("data-src");
+      }
     } else if (entry.target.dataset.isLeaving) {
       self.unobserve(entry.target);
     }
   });
 }, config);
 
-worker.onmessage = async ({ data }) => {
-  console.log("data:", data);
+function handleMediaRefResults(response) {
+  response
+    .text()
+    .then((domString) => {
+      const document = domParser.parseFromString(domString, "text/html");
+      const script = document
+        .querySelector("script[src]")
+        .src.replace(".js", ".json");
 
+      return fetch(script);
+      // worker.postMessage({
+      //   event: "remove_document_write",
+      //   msg: res,
+      // });
+    })
+    .then((scriptRes) => scriptRes.json())
+    .then((res) => console.log("res", res));
+}
+
+worker.onmessage = async ({ data }) => {
   const paragraphs = Array.from(document.getElementsByClassName("mu-p"));
 
-  data.forEach(({ iFrameSrc, order, height, width }) => {
+  data.forEach(({ iFrameSrc, iFrameRef, order, height, width }) => {
+    if (iFrameRef) {
+      paragraphs[order].setAttribute("data-ref", iFrameRef);
+      paragraphs[order].style.height = height;
+      paragraphs[order].style.width = width;
+      // TODO: reset <figure/> style
+      paragraphs[order].style.margin = 0;
+      observer.observe(paragraphs[order]);
+      return;
+    }
+
     const iframe = document.createElement("iframe");
     iframe.setAttribute("data-src", iFrameSrc);
     iframe.width = width;

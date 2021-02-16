@@ -1,12 +1,11 @@
 "use strict";
 
-onmessage = function ({
-  data: {
-    msg: { scriptsContent, metadata },
-    hostname,
-  },
-}) {
+onmessage = function ({ data: { event, msg, hostname } }) {
+  if (event === "remove_document_write") {
+  }
+
   let state = {};
+  const { scriptsContent, metadata } = msg;
 
   for (let i = scriptsContent.length - 1; i >= 0; i--) {
     if (/window.__APOLLO_STATE__ =/.test(scriptsContent[i])) {
@@ -79,17 +78,23 @@ onmessage = function ({
 
     const mediaResourceId = paragraph.iframe.mediaResource.__ref;
     const mediaResource = state[mediaResourceId];
-    const iFrameSrc =
-      mediaResource.iframeSrc ||
-      `https://${hostname}/media/${mediaResourceId.replace(
-        "MediaResource:",
-        ""
-      )}`;
+
     mediaSlots.push({
-      iFrameSrc,
+      iFrameSrc:
+        mediaResource.iframeSrc ||
+        `https://${hostname}/media/${mediaResourceId.replace(
+          "MediaResource:",
+          ""
+        )}`,
+      iFrameRef:
+        !mediaResource.iframeSrc &&
+        `https://${hostname}/media/${mediaResourceId.replace(
+          "MediaResource:",
+          ""
+        )}`,
       order: index,
       height: mediaResource.iframeHeight || 77, // 77 min height for gist
-      width: mediaResource.iframeWidth || 340,
+      width: mediaResource.iframeWidth || "100%",
     });
   });
 

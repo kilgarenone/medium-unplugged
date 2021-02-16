@@ -99,10 +99,11 @@ extensionApi.webRequest.onBeforeRequest.addListener(
     }
 
     // allow mediaResource request in worker.js
-    if (details.type === "xmlhttprequest" && /media\/.+$/.test(details.url)) {
+    if (
+      /* details.type === "xmlhttprequest" && */ /media\/.+$/.test(details.url)
+    ) {
       return;
     }
-
     console.log("details:", details);
 
     let filter = extensionApi.webRequest.filterResponseData(details.requestId);
@@ -168,7 +169,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       const h4 = article.querySelectorAll("h4");
       // get author name
       const authorName = h4[0];
-      console.log("authorName:", authorName);
       authorName && profile.appendChild(authorName);
 
       // get post's metadata- timestamp and duration of reading
