@@ -55,7 +55,10 @@ const observer = new IntersectionObserver(function (entries, self) {
       // TODO: add some kinda spinner while loading
       const mediaRef = entry.target.dataset.ref;
       if (mediaRef) {
-        fetch(mediaRef).then(handleMediaRefResults).catch(onError);
+        fetch(mediaRef)
+          .then(handleMediaRefResults)
+          .then((res) => insertMedia(res, entry.target))
+          .catch(onError);
       } else {
         entry.target.src = entry.target.getAttribute("data-src");
       }
@@ -66,22 +69,28 @@ const observer = new IntersectionObserver(function (entries, self) {
 }, config);
 
 function handleMediaRefResults(response) {
-  response
+  return response
     .text()
     .then((domString) => {
       const document = domParser.parseFromString(domString, "text/html");
-      const script = document
-        .querySelector("script[src]")
-        .src.replace(".js", ".json");
+      const script = document.querySelector("script[src]");
 
-      return fetch(script);
-      // worker.postMessage({
-      //   event: "remove_document_write",
-      //   msg: res,
-      // });
+      if (!script || !/gist.github.com/.test(script.src)) return false;
+
+      // get the json representation of a gist
+      return fetch(script.src.replace(/.js$/, ".json"));
     })
-    .then((scriptRes) => scriptRes.json())
-    .then((res) => console.log("res", res));
+    .then((scriptRes) => scriptRes.json());
+}
+
+function insertMedia(media, paragraphEle) {
+  const styleSheet = document.createElement("link");
+  styleSheet.href = media.stylesheet;
+  styleSheet.rel = "stylesheet";
+  styleSheet.type = "text/css";
+  document.getElementsByTagName("head")[0].appendChild(styleSheet);
+  paragraphEle.setAttribute("style", "");
+  paragraphEle.innerHTML = media.div;
 }
 
 worker.onmessage = async ({ data }) => {
@@ -123,20 +132,6 @@ worker.onmessage = async ({ data }) => {
 
     paragraphs[order].appendChild(iframe);
   });
-  // if (data.event === "insert_media") {
-  //   for (const { iFrameSrc, mediaRefId } of data.msg) {
-  //     if (!iFrameSrc) {
-  //       await fetch(`https://${window.location.hostname}/media/${mediaRefId}`)
-  //         .then((res) => res.text())
-  //         .then((domString) => {
-  //           const document = domParser.parseFromString(domString, "text/html");
-  //           const script = document.querySelector("script[src]");
-  //           console.log("script:", script);
-  //           // sendMessageToTabs(tabs, { precedingParagraphId, src: script.src });
-  //         });
-  //     }
-  //   }
-  // }
 };
 
 window.addEventListener("DOMContentLoaded", initOnDomReady, false);
