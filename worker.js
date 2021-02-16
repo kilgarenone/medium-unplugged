@@ -1,9 +1,6 @@
 "use strict";
 
 onmessage = function ({ data: { event, msg, hostname } }) {
-  if (event === "remove_document_write") {
-  }
-
   let state = {};
   const { scriptsContent, metadata } = msg;
 
@@ -80,12 +77,7 @@ onmessage = function ({ data: { event, msg, hostname } }) {
     const mediaResource = state[mediaResourceId];
 
     mediaSlots.push({
-      iFrameSrc:
-        mediaResource.iframeSrc ||
-        `https://${hostname}/media/${mediaResourceId.replace(
-          "MediaResource:",
-          ""
-        )}`,
+      iFrameSrc: mediaResource.iframeSrc,
       iFrameRef:
         !mediaResource.iframeSrc &&
         `https://${hostname}/media/${mediaResourceId.replace(

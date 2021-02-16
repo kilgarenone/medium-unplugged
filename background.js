@@ -49,19 +49,10 @@ function unwrapImg(dom, tabId) {
 
   const imgContainer = document.createElement("div");
   // the 'paddingBottom' trick to avoid content shifting when an image is loaded
-  imgContainer.style.paddingBottom = `${(
-    (img.height / img.width) *
-    100
-  ).toPrecision(4)}%`;
-  imgContainer.style.position = "relative";
-  imgContainer.style.height = "0";
-  imgContainer.style.marginBottom = "10px";
+  const aspectRatio = `${((img.height / img.width) * 100).toPrecision(4)}`;
+  imgContainer.style.cssText = `position: relative; padding-bottom: ${aspectRatio}%; height: 0; margin-bottom: 10px`;
 
-  img.style.position = "absolute";
-  img.style.top = "0";
-  img.style.left = "0";
-  img.style.width = "100%";
-  img.style.height = "100%";
+  img.style.cssText = `position: absolute; top: 0; left: 0; width: 100%; height: 100%`;
   img.setAttribute("loading", "lazy");
 
   // remove the first div of <figure> that used to contain <img>
@@ -99,14 +90,15 @@ extensionApi.webRequest.onBeforeRequest.addListener(
     }
 
     // allow mediaResource request in worker.js
-    if (
-      /* details.type === "xmlhttprequest" && */ /media\/.+$/.test(details.url)
-    ) {
+    if (/media\/.+$/.test(details.url)) {
       return;
     }
+
     console.log("details:", details);
 
-    let filter = extensionApi.webRequest.filterResponseData(details.requestId);
+    const filter = extensionApi.webRequest.filterResponseData(
+      details.requestId
+    );
 
     let string = "";
     filter.ondata = (event) => {
@@ -130,10 +122,10 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       const article = html.getElementsByTagName("article")[0];
 
       // TODO: proper filter out request at upper-level
-      if (!article || !metadata) {
-        filter.disconnect();
-        return;
-      }
+      // if (!article || !metadata) {
+      //   filter.disconnect();
+      //   return;
+      // }
 
       try {
         ARTICLES_STORE[details.tabId].metadata = JSON.parse(
@@ -149,34 +141,32 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // get the element of an article's title
       const headline = article.querySelectorAll("h1")[0];
 
-      // set an id to a parent to be queried for its child later
-      // headline.parentNode.parentNode.id = ARTICLE_ID;
-
       // get avatar
       const avatar = (
         headline.nextElementSibling || headline.parentNode.nextElementSibling
-      ).querySelector("a img");
-      avatar.width = 56;
-      avatar.height = 56;
-      avatar.style.borderRadius = "50%";
+      ).querySelector(`a[href^="/?source=post_page"]`);
+      console.log("avatar:", avatar);
+      // avatar.width = 56;
+      // avatar.height = 56;
+      // avatar.style.borderRadius = "50%";
 
-      // get bigger avatar image for higher resolution
-      avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
+      // // get bigger avatar image for higher resolution
+      // avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
 
-      profile.appendChild(avatar);
+      // profile.appendChild(avatar);
 
       // TODO: authorName in medium.com/lalala domain is different ele
       const h4 = article.querySelectorAll("h4");
       // get author name
       const authorName = h4[0];
-      authorName && profile.appendChild(authorName);
+      profile.appendChild(authorName);
 
       // get post's metadata- timestamp and duration of reading
       const postMetadata = h4[1];
       // remove svg inside metadata(that 'featured' star)
-      postMetadata && removeElement(postMetadata.querySelector("svg"));
+      removeElement(postMetadata.querySelector("svg"));
 
-      postMetadata && profile.appendChild(postMetadata);
+      profile.appendChild(postMetadata);
 
       // remove action buttons- share post, bookmark
       removeElement(
@@ -227,7 +217,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 );
 
 function removeElement(targetedDom) {
-  targetedDom && targetedDom.parentNode.removeChild(targetedDom);
+  targetedDom && targetedDom.remove();
 }
 
 /**
