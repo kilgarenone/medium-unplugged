@@ -136,16 +136,29 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       }
 
       // create an empty div to contain author info and metadata
-      const profile = document.createElement("div");
+      const profileCont = document.createElement("div");
 
       // get the element of an article's title
       const headline = article.querySelectorAll("h1")[0];
 
+      const metaDataCont =
+        headline.nextElementSibling || headline.parentNode.nextElementSibling;
       // get avatar
-      const avatar = (
-        headline.nextElementSibling || headline.parentNode.nextElementSibling
-      ).querySelector(`a[href^="/?source=post_page"]`);
+      let profile = metaDataCont.querySelectorAll(
+        `a[href*="medium.com/?source=post_page"]`
+      );
+
+      if (!profile.length) {
+        profile = metaDataCont.querySelectorAll(
+          `a[href^="/?source=post_page"]`
+        );
+      }
+
+      // TODO: complete it!!
+      const avatar = profile[0].querySelector("img");
       console.log("avatar:", avatar);
+      const authorName = profile[1].textContent;
+      console.log("authorName:", authorName);
       // avatar.width = 56;
       // avatar.height = 56;
       // avatar.style.borderRadius = "50%";
@@ -155,18 +168,18 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
       // profile.appendChild(avatar);
 
-      // TODO: authorName in medium.com/lalala domain is different ele
-      const h4 = article.querySelectorAll("h4");
-      // get author name
-      const authorName = h4[0];
-      profile.appendChild(authorName);
+      // // TODO: authorName in medium.com/lalala domain is different ele
+      // const h4 = article.querySelectorAll("h4");
+      // // get author name
+      // const authorName = h4[0];
+      // profile.appendChild(authorName);
 
-      // get post's metadata- timestamp and duration of reading
-      const postMetadata = h4[1];
-      // remove svg inside metadata(that 'featured' star)
-      removeElement(postMetadata.querySelector("svg"));
+      // // get post's metadata- timestamp and duration of reading
+      // const postMetadata = h4[1];
+      // // remove svg inside metadata(that 'featured' star)
+      // removeElement(postMetadata.querySelector("svg"));
 
-      profile.appendChild(postMetadata);
+      // profile.appendChild(postMetadata);
 
       // remove action buttons- share post, bookmark
       removeElement(
@@ -201,7 +214,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // );
 
       // prepend the profile section to the top of an article
-      headline.parentNode.insertBefore(profile, headline);
+      headline.parentNode.insertBefore(profileCont, headline);
 
       // finally pass it to rendering engine
       filter.write(encoder.encode(article.innerHTML));
