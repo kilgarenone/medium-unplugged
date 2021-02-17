@@ -135,9 +135,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
         console.error("Error parsing post metadata script content", error);
       }
 
-      // create an empty div to contain author info and metadata
-      const profileCont = document.createElement("div");
-
       // get the element of an article's title
       const headline = article.querySelectorAll("h1")[0];
 
@@ -154,32 +151,28 @@ extensionApi.webRequest.onBeforeRequest.addListener(
         );
       }
 
-      // TODO: complete it!!
+      // create profile container for avatar, author name, post metadata
+      const profileCont = document.createElement("a");
+
       const avatar = profile[0].querySelector("img");
-      console.log("avatar:", avatar);
-      const authorName = profile[1].textContent;
-      console.log("authorName:", authorName);
-      // avatar.width = 56;
-      // avatar.height = 56;
-      // avatar.style.borderRadius = "50%";
+      avatar.width = 56;
+      avatar.height = 56;
+      avatar.style.borderRadius = "50%";
+      // get bigger avatar image for higher resolution
+      avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
+      profileCont.appendChild(avatar);
 
-      // // get bigger avatar image for higher resolution
-      // avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
+      const authorName = document.createElement("span");
+      authorName.innerText = profile[1].textContent;
+      profileCont.appendChild(authorName);
 
-      // profile.appendChild(avatar);
-
-      // // TODO: authorName in medium.com/lalala domain is different ele
-      // const h4 = article.querySelectorAll("h4");
-      // // get author name
-      // const authorName = h4[0];
-      // profile.appendChild(authorName);
+      // set href to point to author's medium page
+      profileCont.href = profile[0].href.replace(/\/\?source=post_page.*/, "");
 
       // // get post's metadata- timestamp and duration of reading
       // const postMetadata = h4[1];
       // // remove svg inside metadata(that 'featured' star)
       // removeElement(postMetadata.querySelector("svg"));
-
-      // profile.appendChild(postMetadata);
 
       // remove action buttons- share post, bookmark
       removeElement(
@@ -204,9 +197,10 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       removeElement(article.firstElementChild);
 
       article.querySelectorAll("section").forEach((section) => {
-        section
-          .querySelector("div > div")
-          .childNodes.forEach((node) => node.classList.add("mu-p"));
+        const children = section.querySelectorAll("div > div > *");
+        console.log("childNodes:", children);
+        if (!children.length) return;
+        children.forEach((node) => node.classList.add("mu-p"));
       });
       // console.log(
       //   "article:",
