@@ -108,8 +108,8 @@ extensionApi.webRequest.onBeforeRequest.addListener(
     filter.onstop = (event) => {
       initArticleState(details.tabId);
       // parse DOMString into a DOM tree
-      // TODO: empty this variable at the end to be good memory citizen?
       let html = domParser.parseFromString(string, "text/html");
+
       for (const script of html.querySelectorAll(
         "script:not([src]):not([type])"
       )) {
@@ -167,19 +167,20 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       profileCont.appendChild(authorName);
 
       // set href to point to author's medium page
-      profileCont.href = profile[0].href.replace(/\/\?source=post_page.*/, "");
+      profileCont.href = profile[0].href.replace(/\?source=post_page.*/, "");
 
-      // // get post's metadata- timestamp and duration of reading
-      // const postMetadata = h4[1];
-      // // remove svg inside metadata(that 'featured' star)
-      // removeElement(postMetadata.querySelector("svg"));
+      const postedAtDate = metaDataCont
+        .querySelector(
+          `a[href*="${urlPathname(details.url)}?source=post_page"]`
+        )
+        .textContent.split("·")[0];
+      const postedAtDateCont = document.createElement("div");
+      postedAtDateCont.textContent = postedAtDate;
+
+      metaDataCont.appendChild(postedAtDateCont);
 
       // remove action buttons- share post, bookmark
-      removeElement(
-        (
-          headline.nextElementSibling || headline.parentNode.nextElementSibling
-        ).querySelector("div")
-      );
+      removeElement(metaDataCont.querySelector("div"));
 
       // remove all images' placeholder
       const allImages = article.querySelectorAll("img:not([srcset])");
@@ -198,7 +199,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
       article.querySelectorAll("section").forEach((section) => {
         const children = section.querySelectorAll("div > div > *");
-        console.log("childNodes:", children);
         if (!children.length) return;
         children.forEach((node) => node.classList.add("mu-p"));
       });
@@ -213,6 +213,9 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // finally pass it to rendering engine
       filter.write(encoder.encode(article.innerHTML));
 
+      // clean up memory(?)
+      html = null;
+
       console.log("finished");
       filter.disconnect();
     };
@@ -225,6 +228,17 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
 function removeElement(targetedDom) {
   targetedDom && targetedDom.remove();
+}
+
+function urlPathname(url) {
+  if (url && url.startsWith("http")) {
+    try {
+      return new URL(url).pathname;
+    } catch (e) {
+      console.log(`url not valid: ${url} error: ${e}`);
+    }
+  }
+  return url;
 }
 
 /**
