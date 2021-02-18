@@ -92,17 +92,17 @@ a:hover {
   text-decoration: underline;
 }
 
-hr {
+[role="separator"] {
   height: 0.25em;
-  margin: 15px 0;
+  margin-bottom: var(--s1);
   overflow: hidden;
   background: transparent;
   border: 0;
   border-bottom: 1px solid #dfe2e5;
 }
 
-hr:after,
-hr:before {
+[role="separator"]:after,
+[role="separator"]:before {
   display: table;
   content: "";
   clear: both;
@@ -136,11 +136,11 @@ h6 {
 
 h1.mu-headline {
   margin-top: var(--s-1);
-  font-size: clamp(2rem, 8vw, 2.3rem);
+  font-size: clamp(2rem, 8vw, 2rem);
 }
 h1,
 h1.mu-p {
-  font-size: clamp(1.55rem, 5.5vw, 1.95rem);
+  font-size: clamp(1.5rem, 5.5vw, 1.7rem);
   font-family: var(--font-plain);
   line-height: 1.15;
   padding-top: var(--s1);
@@ -149,7 +149,7 @@ h1.mu-p {
 
 h2,
 h2.mu-p {
-  font-size: clamp(1.35rem, 4.6vw, 1.7rem);
+  font-size: clamp(1.3rem, 4vw, 1.5rem);
   margin-top: var(--s2);
   margin-bottom: var(--s-1);
 }

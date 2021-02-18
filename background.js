@@ -229,12 +229,13 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // prepend the profile section to the top of an article
       headline.parentNode.insertBefore(profileCont, headline);
 
-      const page = `<html><head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body>${article.outerHTML}</body>
-      </html>`;
+      const page = `<html>
+                    <head>
+                      <meta charset="utf-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    </head>
+                    <body>${article.outerHTML}</body>
+                    </html>`;
       // finally pass it to rendering engine
       filter.write(encoder.encode(page));
 
