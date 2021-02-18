@@ -81,7 +81,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
   function (details) {
     // cancel favicon.ico request
     if (!/.+(?<!\.ico)$/.test(details.url)) {
-      return { cancel: true };
+      return;
     }
 
     // allow requests for static assets served by medium
@@ -198,7 +198,9 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       removeElement(article.firstElementChild);
 
       article.querySelectorAll("section").forEach((section) => {
-        const children = section.querySelectorAll("div > div > *");
+        const children = Array.from(
+          section.querySelector("div > div").children
+        );
         if (!children.length) return;
         children.forEach((node) => node.classList.add("mu-p"));
       });
@@ -211,7 +213,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       headline.parentNode.insertBefore(profileCont, headline);
 
       // finally pass it to rendering engine
-      filter.write(encoder.encode(article.innerHTML));
+      filter.write(encoder.encode(article.outerHTML));
 
       // clean up memory(?)
       html = null;

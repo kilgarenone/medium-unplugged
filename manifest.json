@@ -10,6 +10,7 @@
     {
       "matches": ["https://medium.com/*", "https://*.medium.com/*"],
       "js": ["content.js"],
+      "css": ["content.css"],
       "run_at": "document_start"
     }
   ],
