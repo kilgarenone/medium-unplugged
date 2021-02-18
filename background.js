@@ -20,6 +20,10 @@ function onError(error) {
 }
 
 const domParser = new DOMParser();
+
+function convertToDom(domString) {
+  return domParser.parseFromString(domString, "text/html");
+}
 const ARTICLES_STORE = {};
 
 extensionApi.runtime.onMessage.addListener(handleMessageFromContent);
@@ -100,15 +104,15 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       details.requestId
     );
 
-    let string = "";
+    let domString = "";
     filter.ondata = (event) => {
-      string += decoder.decode(event.data, { stream: true });
+      domString += decoder.decode(event.data, { stream: true });
     };
 
     filter.onstop = (event) => {
       initArticleState(details.tabId);
       // parse DOMString into a DOM tree
-      let html = domParser.parseFromString(string, "text/html");
+      let html = convertToDom(domString);
 
       for (const script of html.querySelectorAll(
         "script:not([src]):not([type])"
@@ -137,6 +141,9 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
       // get the element of an article's title
       const headline = article.querySelectorAll("h1")[0];
+      headline.className = "mu-headline";
+
+      const requestPathname = urlPathname(details.url);
 
       const metaDataCont =
         headline.nextElementSibling || headline.parentNode.nextElementSibling;
@@ -151,33 +158,43 @@ extensionApi.webRequest.onBeforeRequest.addListener(
         );
       }
 
-      // create profile container for avatar, author name, post metadata
-      const profileCont = document.createElement("a");
+      if (!profile.length) {
+        profile = metaDataCont.querySelectorAll(
+          `a[href^="/${
+            requestPathname.split("/").filter(Boolean)[0]
+          }?source=post_page"]`
+        );
+      }
 
+      // create profile container for avatar, author name, post metadata
       const avatar = profile[0].querySelector("img");
-      avatar.width = 56;
-      avatar.height = 56;
+      avatar.width = 50;
+      avatar.height = 50;
       avatar.style.borderRadius = "50%";
       // get bigger avatar image for higher resolution
       avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
-      profileCont.appendChild(avatar);
+      avatar.style.marginRight = "9px";
 
-      const authorName = document.createElement("span");
-      authorName.innerText = profile[1].textContent;
-      profileCont.appendChild(authorName);
-
+      const authorName = document.createElement("a");
+      authorName.textContent = profile[1].textContent;
       // set href to point to author's medium page
-      profileCont.href = profile[0].href.replace(/\?source=post_page.*/, "");
+      authorName.href = profile[0].href.replace(/\?source=post_page.*/, "");
 
-      const postedAtDate = metaDataCont
-        .querySelector(
-          `a[href*="${urlPathname(details.url)}?source=post_page"]`
-        )
+      const postedAtDate = document.createElement("div");
+      postedAtDate.textContent = metaDataCont
+        .querySelector(`a[href*="${requestPathname}?source=post_page"]`)
         .textContent.split("·")[0];
-      const postedAtDateCont = document.createElement("div");
-      postedAtDateCont.textContent = postedAtDate;
+      postedAtDate.className = "mu-post-date";
 
-      metaDataCont.appendChild(postedAtDateCont);
+      const profileCont = document.createElement("div");
+      profileCont.style.cssText = `display: flex; align-items: center`;
+      profileCont.innerHTML = `${avatar.outerHTML}
+                              <div>
+                                ${authorName.outerHTML}
+                                ${postedAtDate.outerHTML}
+                              </div>`;
+
+      // metaDataCont.appendChild(postedAtDateCont);
 
       // remove action buttons- share post, bookmark
       removeElement(metaDataCont.querySelector("div"));
@@ -212,8 +229,14 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // prepend the profile section to the top of an article
       headline.parentNode.insertBefore(profileCont, headline);
 
+      const page = `<html><head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body>${article.outerHTML}</body>
+      </html>`;
       // finally pass it to rendering engine
-      filter.write(encoder.encode(article.outerHTML));
+      filter.write(encoder.encode(page));
 
       // clean up memory(?)
       html = null;

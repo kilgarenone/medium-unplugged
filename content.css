@@ -10,29 +10,46 @@
 
 img {
   max-width: 100%;
-  padding: 0.7em 0;
 }
 
 :root {
   --black-100: #17181a;
+  --black-80: #424242;
+  --black-60: #555759;
+  --black-50: #626a6e;
+  --black-30: #b1b4b6;
+  --black-20: #e1e3e5;
   --font-plain: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial,
     sans-serif;
   --font-special: "Times New Roman", Times, serif;
   --font-code: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
-  --ratio: 1.5;
-  --s-3: calc(var(--s1) / var(--ratio) / var(--ratio) / var(--ratio));
-  --s-2: calc(var(--s1) / var(--ratio) / var(--ratio));
-  --s-1: calc(var(--s1) / var(--ratio));
-  --s1: 1rem;
-  --s2: 1.2em;
-  --s3: 1.5em;
-  --s4: 2.05em;
-  --s5: 4em;
-
+  --ratio: 1.4;
+  --s-5: calc(
+    var(--s0) / var(--ratio) / var(--ratio) / var(--ratio) / var(--ratio) /
+      var(--ratio)
+  );
+  --s-4: calc(
+    var(--s0) / var(--ratio) / var(--ratio) / var(--ratio) / var(--ratio)
+  );
+  --s-3: calc(var(--s0) / var(--ratio) / var(--ratio) / var(--ratio));
+  --s-2: calc(var(--s0) / var(--ratio) / var(--ratio));
+  --s-1: calc(var(--s0) / var(--ratio));
+  --s0: 1rem;
+  --s1: calc(var(--s0) * var(--ratio));
+  --s2: calc(var(--s0) * var(--ratio) * var(--ratio));
+  --s3: calc(var(--s0) * var(--ratio) * var(--ratio) * var(--ratio));
+  --s4: calc(
+    var(--s0) * var(--ratio) * var(--ratio) * var(--ratio) * var(--ratio)
+  );
+  --s5: calc(
+    var(--s0) * var(--ratio) * var(--ratio) * var(--ratio) * var(--ratio) *
+      var(--ratio)
+  );
+  --measure: 56ch;
   line-height: var(--ratio);
-  font-size: 1.26em;
+  font-size: calc(1rem + 0.8vw);
   font-family: var(--font-plain);
   color: var(--black-100);
 }
@@ -45,12 +62,12 @@ body {
   word-wrap: break-word;
 }
 
-img {
-  max-width: 100%;
-}
-
-article > * + * {
+.mu-p {
   margin-bottom: var(--s1);
+}
+.mu-post-date {
+  font-size: var(--s-1);
+  color: var(--black-50);
 }
 
 li ul {
@@ -62,15 +79,9 @@ strong {
 }
 
 article {
-  max-width: 69ch;
+  max-width: var(--measure);
   margin: 0 auto;
-  padding: 45px;
-}
-
-@media (max-width: 767px) {
-  article {
-    padding: 15px;
-  }
+  padding: var(--s-1);
 }
 
 a {
@@ -113,45 +124,45 @@ kbd {
   box-shadow: inset 0 -1px 0 #d1d5da;
 }
 
-h1 {
-  font-family: var(--font-special);
-  line-height: 1.15;
-}
-
-h2 {
-  font-weight: 700;
-  line-height: 1.25;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid #eaecef;
-}
-
+h2,
 h3,
 h4,
 h5,
 h6 {
+  color: var(--black-80);
   font-weight: 600;
   line-height: 1.25;
 }
 
-h1 {
-  font-size: var(--s5);
+h1.mu-headline {
+  margin-top: var(--s-1);
+  font-size: clamp(2rem, 8vw, 2.3rem);
+}
+h1,
+h1.mu-p {
+  font-size: clamp(1.55rem, 5.5vw, 1.95rem);
+  font-family: var(--font-plain);
+  line-height: 1.15;
+  padding-top: var(--s1);
+  margin-bottom: var(--s-1);
 }
 
-h2 {
-  font-size: var(--s4);
-  margin-top: var(--s4);
-  margin-bottom: var(--s1);
+h2,
+h2.mu-p {
+  font-size: clamp(1.35rem, 4.6vw, 1.7rem);
+  margin-top: var(--s2);
+  margin-bottom: var(--s-1);
 }
 
 h3 {
-  font-size: var(--s3);
-  margin-top: var(--s3);
+  font-size: var(--s2);
+  margin-top: var(--s2);
   margin-bottom: var(--s-1);
 }
 
 h4 {
-  font-size: var(--s2);
-  margin-top: var(--s3);
+  font-size: var(--s1);
+  margin-top: var(--s2);
   margin-bottom: var(--s-1);
 }
 
@@ -176,7 +187,8 @@ pre {
   font-size: 82%;
 }
 
-code {
+code,
+pre {
   padding: 0.2em 0.4em;
   background-color: rgba(27, 31, 35, 0.05);
   border-radius: 3px;
@@ -217,33 +229,6 @@ dl dd {
   margin-bottom: 16px;
 }
 
-table {
-  display: block;
-  width: 100%;
-  overflow: auto;
-  border-spacing: 0;
-  border-collapse: collapse;
-}
-
-table th {
-  font-weight: 600;
-}
-
-table td,
-table th {
-  padding: 6px 13px;
-  border: 1px solid #dfe2e5;
-}
-
-table tr {
-  background-color: #fff;
-  border-top: 1px solid #c6cbd1;
-}
-
-table tr:nth-child(2n) {
-  background-color: #f6f8fa;
-}
-
 pre[class*="language-"] {
   margin: 1em 0 !important;
   font-size: 0.8em !important;
@@ -253,48 +238,9 @@ aside {
   padding: 1em;
 }
 
-aside.info {
-  background-color: rgba(0, 255, 0, 0.1);
-}
-
 figure {
   padding: 16px 0;
 }
 figcaption {
   color: grey;
-}
-
-a.skip-main {
-  left: -999px;
-  position: absolute;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  z-index: -999;
-}
-a.skip-main:focus,
-a.skip-main:active {
-  color: #fff;
-  background-color: #000;
-  left: auto;
-  top: auto;
-  width: 30%;
-  height: auto;
-  overflow: auto;
-  margin: 10px 35%;
-  padding: 5px;
-  border-radius: 15px;
-  border: 4px solid yellow;
-  text-align: center;
-  font-size: 1.2em;
-  z-index: 999;
-}
-
-.back-to-top {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  background-color: #eee;
-  padding: 0 10px;
 }
