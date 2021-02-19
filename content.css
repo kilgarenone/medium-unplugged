@@ -93,19 +93,8 @@ a:hover {
 }
 
 [role="separator"] {
-  height: 0.25em;
   margin-bottom: var(--s1);
-  overflow: hidden;
-  background: transparent;
-  border: 0;
   border-bottom: 1px solid #dfe2e5;
-}
-
-[role="separator"]:after,
-[role="separator"]:before {
-  display: table;
-  content: "";
-  clear: both;
 }
 
 details summary {
@@ -137,6 +126,7 @@ h6 {
 h1.mu-headline {
   margin-top: var(--s-1);
   font-size: clamp(2rem, 8vw, 2rem);
+  font-family: Arial;
 }
 h1,
 h1.mu-p {
