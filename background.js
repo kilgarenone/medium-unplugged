@@ -214,12 +214,23 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // remove the <section/> used to contain 'you have red 3 article this month...'
       removeElement(article.firstElementChild);
 
+      // assign a classname to all paragraphs for later query for emded insertion mainly
       article.querySelectorAll("section > div > div").forEach((div) => {
         div.className = "mu-section";
         const children = Array.from(div.children);
         if (!children.length) return;
         children.forEach((node) => node.classList.add("mu-p"));
       });
+
+      // convert Medium's link card to a simple anchor link with text
+      const links = article.querySelectorAll(".mu-p > a > div > div > h2");
+      if (links.length) {
+        links.forEach((ele) => {
+          const a = ele.parentNode.parentNode.parentNode;
+          a.parentNode.classList.add("mu-link");
+          a.textContent = ele.textContent;
+        });
+      }
       // console.log(
       //   "article:",
       //   Array.from(html.getElementsByClassName("mu-p"))

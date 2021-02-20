@@ -94,6 +94,14 @@ body {
   color: var(--color-mid-grey);
 }
 
+.mu-link {
+  --flow-space: var(--s-3);
+}
+.mu-link a {
+  text-decoration: underline;
+  font-weight: 600;
+}
+
 li ul {
   margin-top: var(--s-3);
 }
@@ -195,6 +203,11 @@ h2 + * {
   --flow-space: var(--s-1);
 }
 
+p + ol,
+p + ul {
+  --flow-space: var(--s-1);
+}
+
 h3 {
   margin-top: var(--s2);
   margin-bottom: var(--s-1);
@@ -212,11 +225,10 @@ pre {
   font-size: var(--s-1);
 }
 
-code,
-pre {
-  padding: 0.2rem 0.4rem;
+code {
+  padding: 0.15rem 0.25rem;
   background-color: var(--color-light-grey);
-  border-radius: 0.25rem;
+  border-radius: 0.3rem;
   letter-spacing: 0.03ch;
 }
 
@@ -243,7 +255,7 @@ li + li {
 }
 
 pre {
-  background-color: #272822;
+  background-color: var(--color-black);
   padding: var(--s-1);
   margin: var(--s-1) 0;
   font-size: 0.8em;
