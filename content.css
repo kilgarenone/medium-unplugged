@@ -110,7 +110,7 @@ article {
 
 a {
   text-decoration: none;
-  text-underline-offset: 5px;
+  text-underline-offset: 4px;
 }
 
 a:hover {
@@ -154,7 +154,7 @@ h4 {
 }
 
 h1.mu-headline {
-  /* margin-top: var(--s1); */
+  margin-top: var(--s1);
   --fluid-type-min: 1.7rem;
   --fluid-type-max: 2rem;
   --fluid-type-target: 3vw;
@@ -242,9 +242,30 @@ li + li {
   margin-top: 0.25em;
 }
 
-pre[class*="language-"] {
-  margin: 1em 0 !important;
-  font-size: 0.8em !important;
+pre {
+  background-color: #272822;
+  padding: var(--s-1);
+  margin: var(--s-1) 0;
+  font-size: 0.8em;
+  border-radius: 0.3em;
+  color: #f8f8f2;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  overflow: auto;
+  max-height: 30em;
 }
 
 figure {
@@ -252,7 +273,7 @@ figure {
 }
 
 figure img {
-  box-shadow: 2px 0px 0.3rem rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0px 0.3rem rgba(180, 194, 221, 0.57);
 }
 figcaption {
   color: var(--color-mid-grey);
