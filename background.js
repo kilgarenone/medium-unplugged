@@ -83,22 +83,17 @@ const encoder = new TextEncoder();
 
 extensionApi.webRequest.onBeforeRequest.addListener(
   function (details) {
-    // cancel favicon.ico request
-    if (!/.+(?<!\.ico)$/.test(details.url)) {
-      return;
-    }
+    console.log("details:", details);
+    // only apply extension on 'path-name-ae4651dc07ba'
+    if (!/.+-.{12}$/.test(details.url)) return;
+    // allow favicon.ico request
+    if (!/.+(?<!\.ico)$/.test(details.url)) return;
 
     // allow requests for static assets served by medium
-    if (/miro.medium.com.+/.test(details.url)) {
-      return;
-    }
+    if (/miro.medium.com.+/.test(details.url)) return;
 
     // allow mediaResource request in worker.js
-    if (/media\/.+$/.test(details.url)) {
-      return;
-    }
-
-    console.log("details:", details);
+    if (/media\/.+$/.test(details.url)) return;
 
     const filter = extensionApi.webRequest.filterResponseData(
       details.requestId
