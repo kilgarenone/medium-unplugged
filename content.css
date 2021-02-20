@@ -13,13 +13,12 @@ img {
 }
 
 :root {
-  --black-100: #17181a;
-  --black-80: #424242;
-  --black-60: #555759;
-  --black-50: #626a6e;
-  --black-30: #b1b4b6;
-  --black-20: #e1e3e5;
-  --font-sans-serif: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+  --color-black: #1c2334;
+  --color-dark-grey: #2c4252;
+  --color-mid-grey: #818e98;
+  --color-grey: #cdd2d6;
+  --color-light-grey: #e6ebf0;
+  --font-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir,
     helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial, sans-serif;
   --font-serif: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
     Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
@@ -53,8 +52,8 @@ img {
 
   line-height: var(--line-height);
   font-size: calc(1.25rem + 0.3vw);
-  font-family: var(--font-sans-serif);
-  color: var(--black-100);
+  font-family: var(--font-sans);
+  color: var(--color-black);
 }
 
 /* https://blog.typekit.com/2016/08/17/flexible-typography-with-css-locks/ */
@@ -70,20 +69,29 @@ img {
   }
 }
 
+@media (prefers-reduced-motion) {
+  body {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   scroll-behavior: smooth;
-  text-rendering: optimizeLegibility;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeSpeed;
   word-wrap: break-word;
 }
 
-.mu-p {
-  margin-bottom: var(--s1);
+.mu-section {
+  --flow-space: var(--s1);
 }
+
+.mu-section > * + * {
+  margin-top: var(--flow-space, 1.25rem);
+}
+
 .mu-post-date {
   font-size: var(--s-1);
-  color: var(--black-50);
+  color: var(--color-mid-grey);
 }
 
 li ul {
@@ -102,6 +110,7 @@ article {
 
 a {
   text-decoration: none;
+  text-underline-offset: 5px;
 }
 
 a:hover {
@@ -109,8 +118,9 @@ a:hover {
 }
 
 [role="separator"] {
-  margin-bottom: var(--s1);
-  border-bottom: 1px solid #dfe2e5;
+  margin-bottom: var(--s2);
+  padding-top: var(--s-1);
+  border-bottom: 2px solid var(--color-light-grey);
 }
 
 kbd {
@@ -130,7 +140,6 @@ h2,
 h3,
 h4 {
   line-height: 1.15;
-  font-weight: 600;
 }
 
 h1,
@@ -145,7 +154,7 @@ h4 {
 }
 
 h1.mu-headline {
-  margin-top: var(--s-1);
+  /* margin-top: var(--s1); */
   --fluid-type-min: 1.7rem;
   --fluid-type-max: 2rem;
   --fluid-type-target: 3vw;
@@ -159,9 +168,9 @@ h1 {
 }
 
 h2 {
-  --fluid-type-min: 1.3rem;
-  --fluid-type-max: 1.5rem;
-  --fluid-type-target: 1vw;
+  --fluid-type-min: 1.2rem;
+  --fluid-type-max: 1.4rem;
+  --fluid-type-target: 0.5vw;
 }
 
 h3 {
@@ -169,14 +178,21 @@ h3 {
   --fluid-type-max: 1.3rem;
 }
 
-h1.mu-p {
-  padding-top: var(--s1);
+h1 {
+  --flow-space: var(--s4);
 }
 
-h1.mu-p,
-h2.mu-p {
-  margin-top: var(--s1);
-  margin-bottom: var(--s-1);
+h1 + h2 {
+  --flow-space: var(--s1);
+}
+
+h2 {
+  --flow-space: var(--s3);
+}
+
+h1 + *,
+h2 + * {
+  --flow-space: var(--s-1);
 }
 
 h3 {
@@ -193,20 +209,21 @@ code,
 kbd,
 pre {
   font-family: var(--font-mono);
-  font-size: 82%;
+  font-size: var(--s-1);
 }
 
 code,
 pre {
-  padding: 0.2em 0.4em;
-  background-color: rgba(27, 31, 35, 0.05);
-  border-radius: 3px;
+  padding: 0.2rem 0.4rem;
+  background-color: var(--color-light-grey);
+  border-radius: 0.25rem;
+  letter-spacing: 0.03ch;
 }
 
 blockquote {
-  padding: 0 1em;
-  color: #6a737d;
-  border-left: 0.25em solid #dfe2e5;
+  padding: 0 1rem;
+  color: var(--color-mid-grey);
+  border-left: 0.24rem solid var(--color-dark-grey);
 }
 
 blockquote > :first-child {
@@ -218,7 +235,7 @@ blockquote > :last-child {
 }
 
 li > * {
-  margin-top: 16px;
+  margin-top: var(--s1);
 }
 
 li + li {
@@ -231,8 +248,15 @@ pre[class*="language-"] {
 }
 
 figure {
-  padding: 1rem 0;
+  padding: var(--s1) 0;
+}
+
+figure img {
+  box-shadow: 2px 0px 0.3rem rgba(0, 0, 0, 0.1);
 }
 figcaption {
-  color: grey;
+  color: var(--color-mid-grey);
+  font-size: var(--s-1);
+  max-width: 56ch;
+  margin: 0 auto;
 }

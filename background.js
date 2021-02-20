@@ -214,10 +214,9 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // remove the <section/> used to contain 'you have red 3 article this month...'
       removeElement(article.firstElementChild);
 
-      article.querySelectorAll("section").forEach((section) => {
-        const children = Array.from(
-          section.querySelector("div > div").children
-        );
+      article.querySelectorAll("section > div > div").forEach((div) => {
+        div.className = "mu-section";
+        const children = Array.from(div.children);
         if (!children.length) return;
         children.forEach((node) => node.classList.add("mu-p"));
       });
