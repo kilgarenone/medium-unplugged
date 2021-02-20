@@ -85,6 +85,10 @@ body {
   --flow-space: var(--s1);
 }
 
+.mu-section > * {
+  margin-top: var(--flow-space, 1.25rem);
+}
+
 .mu-section > * + * {
   margin-top: var(--flow-space, 1.25rem);
 }
@@ -113,7 +117,7 @@ strong {
 article {
   max-width: var(--measure);
   margin: 0 auto;
-  padding: var(--s-1);
+  padding: var(--s-1) var(--s-1) var(--s4);
 }
 
 a {
@@ -127,8 +131,9 @@ a:hover {
 
 [role="separator"] {
   margin-bottom: var(--s2);
-  padding-top: var(--s-1);
-  border-bottom: 2px solid var(--color-light-grey);
+  margin-top: var(--s2);
+  height: 2px;
+  background-color: var(--color-light-grey);
 }
 
 kbd {
@@ -278,10 +283,6 @@ pre {
   hyphens: none;
   overflow: auto;
   max-height: 30em;
-}
-
-figure {
-  padding: var(--s1) 0;
 }
 
 figure img {
