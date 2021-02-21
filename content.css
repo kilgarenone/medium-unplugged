@@ -230,12 +230,12 @@ pre {
   font-size: var(--s-1);
 }
 
-code {
+/* code {
   padding: 0.15rem 0.25rem;
   background-color: var(--color-light-grey);
   border-radius: 0.3rem;
   letter-spacing: 0.03ch;
-}
+} */
 
 blockquote {
   padding: 0 1rem;
@@ -261,13 +261,12 @@ li + li {
 
 pre {
   background-color: var(--color-black);
-  padding: var(--s-1);
+  /* padding: var(--s-1);
   margin: var(--s-1) 0;
   font-size: 0.8em;
   border-radius: 0.3em;
   color: #f8f8f2;
   text-shadow: 0 1px rgba(0, 0, 0, 0.3);
-  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
   text-align: left;
   white-space: pre;
   word-spacing: normal;
@@ -282,7 +281,44 @@ pre {
   -ms-hyphens: none;
   hyphens: none;
   overflow: auto;
-  max-height: 30em;
+  max-height: 35rem; */
+}
+
+pre > * + * {
+  display: block;
+  margin-top: var(--s-1);
+}
+
+span[data_microlight_type="not-formatted"] {
+  color: #b2ccd6;
+}
+
+span[data_microlight_type="keywords"] {
+  color: #f1e655;
+}
+
+span[data_microlight_type="punctuation"] {
+  color: #d9f5dd;
+}
+
+span[data_microlight_type="strings-regex"] {
+  color: #c3e88d;
+}
+
+span[data_microlight_type="comments"] {
+  color: #49656f;
+}
+
+.microlight {
+  font-family: monospace;
+  white-space: pre;
+  background-color: #263238;
+  color: #aabbc3;
+  padding: 15px;
+  text-align: left;
+  overflow-x: auto;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+  border-radius: 0.2em;
 }
 
 figure img {

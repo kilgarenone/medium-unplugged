@@ -79,13 +79,17 @@ function unwrapImg(dom, tabId) {
 let postState = {};
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
-// const ARTICLE_ID = "medium-unplugged-article";
 
 extensionApi.webRequest.onBeforeRequest.addListener(
   function (details) {
     console.log("details:", details);
+    if (/.+-\w{12}\?source=.+$/.test(details.url)) {
+      return {
+        redirectUrl: details.url.replace(/\?source=.+/, ""),
+      };
+    }
     // only apply extension on 'path-name-ae4651dc07ba'
-    if (!/.+-.{12}$/.test(details.url)) return;
+    if (!/.+-\w{11,12}$/.test(details.url)) return;
     // allow favicon.ico request
     if (!/.+(?<!\.ico)$/.test(details.url)) return;
 
@@ -119,12 +123,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
       const metadata = html.querySelector('script[type="application/ld+json"]');
       const article = html.getElementsByTagName("article")[0];
-
-      // TODO: proper filter out request at upper-level
-      // if (!article || !metadata) {
-      //   filter.disconnect();
-      //   return;
-      // }
 
       try {
         ARTICLES_STORE[details.tabId].metadata = JSON.parse(
@@ -189,8 +187,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
                                 ${postedAtDate.outerHTML}
                               </div>`;
 
-      // metaDataCont.appendChild(postedAtDateCont);
-
       // remove action buttons- share post, bookmark
       removeElement(metaDataCont.querySelector("div"));
 
@@ -234,13 +230,23 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // prepend the profile section to the top of an article
       headline.parentNode.insertBefore(profileCont, headline);
 
+      // TODO: inline content.css into <style></style>
       const page = `<html>
                     <head>
                       <meta charset="UTF-8">
                       <meta name="viewport" content="width=device-width, initial-scale=1.0">
                       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
                     </head>
-                    <body>${article.outerHTML}</body>
+                    <body>${article.outerHTML}
+                    <div class='microlight'>/* Javascript */
+                    'use strict'
+
+                    const app = require('express')()
+                    const compression = require('compression')
+
+                        app.use(compression())
+                    </div>
+                    </body>
                     </html>`;
       // finally pass it to rendering engine
       filter.write(encoder.encode(page));

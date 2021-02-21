@@ -158,4 +158,10 @@ function initOnDomReady() {
       worker.postMessage({ msg, hostname: window.location.hostname });
     }
   });
+
+  const script = document.createElement("script");
+  script.src = extensionApi.runtime.getURL("syntax-highlighter.js");
+
+  // Append to the `head` element
+  document.head.appendChild(script);
 }
