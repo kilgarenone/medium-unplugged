@@ -15,13 +15,13 @@
     factory((root.microlight = {}));
   }
 })(this, function (exports) {
-  let el; // current microlighted element to run through
-  // dynamic set of nodes to highlight
-  const microlighted = document.getElementsByClassName("microlight");
+  function reset(codeBlocks) {
+    let el; // current microlighted element to run through
+    // dynamic set of nodes to highlight
+    // const microlighted = document.getElementsByClassName("microlight");
 
-  const reset = function (i) {
-    for (i = 0; (el = microlighted[i++]); ) {
-      var text = el.textContent,
+    for (i = 0; (el = codeBlocks[i++]); ) {
+      let text = el.textContent,
         pos = 0, // current position
         next1 = text[0], // next character
         chr = 1, // current character
@@ -177,7 +177,7 @@
         token += chr;
       }
     }
-  };
+  }
 
   exports.reset = reset;
 

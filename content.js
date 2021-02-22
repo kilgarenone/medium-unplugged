@@ -49,23 +49,32 @@ const config = {
   threshold: 0.5, // when half of a target has intersected
 };
 const observer = new IntersectionObserver(function (entries, self) {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.dataset.isLeaving = true;
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
 
-      const mediaRef = entry.target.dataset.ref;
-      if (mediaRef) {
-        fetch(mediaRef)
-          .then(handleMediaRefResults)
-          .then((res) => insertMedia(res, entry.target))
-          .catch(onError);
-      } else {
-        entry.target.src = entry.target.getAttribute("data-src");
-      }
-    } else if (entry.target.dataset.isLeaving) {
+    if (entry.target.dataset.isLeaving) {
       self.unobserve(entry.target);
+      continue;
     }
-  });
+
+    entry.target.dataset.isLeaving = true;
+
+    if (entry.target.nodeName === "PRE") {
+      console.log("entry:", window);
+      console.log(window.window_focus);
+      continue;
+    }
+
+    const mediaRef = entry.target.dataset.ref;
+    if (mediaRef) {
+      fetch(mediaRef)
+        .then(handleMediaRefResults)
+        .then((res) => insertMedia(res, entry.target))
+        .catch(onError);
+    } else {
+      entry.target.src = entry.target.getAttribute("data-src");
+    }
+  }
 }, config);
 
 function handleMediaRefResults(response) {
@@ -159,12 +168,23 @@ function initOnDomReady() {
     }
   });
 
-  const haha = document.getElementsByClassName("microlight")[0];
-  console.log(haha.innerText);
-  haha.textContent = haha.innerText;
-  const script = document.createElement("script");
-  script.src = extensionApi.runtime.getURL("syntax-highlighter.js");
+  // observe code blocks to be lazily syntax-highlighted
+  const codeBlocks = document.getElementsByTagName("pre");
+  if (codeBlocks.length) {
+    const script = document.createElement("script");
+    script.src = extensionApi.runtime.getURL("syntax-highlighter.js");
+    // Append to the `head` element
+    document.head.appendChild(script);
 
-  // Append to the `head` element
-  document.head.appendChild(script);
+    script.addEventListener("load", (event) => {
+      for (const code of codeBlocks) {
+        code && observer.observe(code);
+      }
+    });
+  }
+  // document
+  //   .getElementsByTagName("pre")
+  //   .forEach((code) => code && observer.observe(code));
+  // console.log(haha.innerText);
+  // haha.textContent = haha.innerText;
 }
