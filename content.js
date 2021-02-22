@@ -159,6 +159,9 @@ function initOnDomReady() {
     }
   });
 
+  const haha = document.getElementsByClassName("microlight")[0];
+  console.log(haha.innerText);
+  haha.textContent = haha.innerText;
   const script = document.createElement("script");
   script.src = extensionApi.runtime.getURL("syntax-highlighter.js");
 

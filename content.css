@@ -284,28 +284,23 @@ pre {
   max-height: 35rem; */
 }
 
-pre > * + * {
-  display: block;
-  margin-top: var(--s-1);
-}
-
-span[data_microlight_type="not-formatted"] {
+.token-not-formatted {
   color: #b2ccd6;
 }
 
-span[data_microlight_type="keywords"] {
+.token-keywords {
   color: #f1e655;
 }
 
-span[data_microlight_type="punctuation"] {
+.token-punctuation {
   color: #d9f5dd;
 }
 
-span[data_microlight_type="strings-regex"] {
+.token-strings-regex {
   color: #c3e88d;
 }
 
-span[data_microlight_type="comments"] {
+.token-comments {
   color: #49656f;
 }
 

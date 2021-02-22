@@ -1,11 +1,9 @@
 /**
- * @fileoverview microlight - syntax highlightning library
- * @version 0.0.1
+ * microlight - highlights code in any language
  *
  * @license MIT, see http://github.com/asvd/microlight
  * @copyright 2016 asvd <heliosframework@gmail.com>
  *
- * Code structure aims at minimizing the compressed library size
  */
 
 (function (root, factory) {
@@ -17,16 +15,11 @@
     factory((root.microlight = {}));
   }
 })(this, function (exports) {
-  // for better compression
-  var _window = window,
-    _document = document,
-    appendChild = "appendChild",
-    test = "test",
-    el, // current microlighted element to run through
-    // dynamic set of nodes to highlight
-    microlighted = _document.getElementsByClassName("microlight");
+  let el; // current microlighted element to run through
+  // dynamic set of nodes to highlight
+  const microlighted = document.getElementsByClassName("microlight");
 
-  var reset = function (i) {
+  const reset = function (i) {
     for (i = 0; (el = microlighted[i++]); ) {
       var text = el.textContent,
         pos = 0, // current position
@@ -34,7 +27,7 @@
         chr = 1, // current character
         prev1, // previous character
         prev2, // the one before the previous
-        token = (el.innerHTML = ""), // current token content // (and cleaning the node)
+        token = "", // current token content
         // current token type:
         //  0: anything else (whitespaces / newlines)
         //  1: operator or brace
@@ -52,15 +45,17 @@
         lastTokenType,
         // flag determining if token is multi-character
         multichar,
-        node,
-        // calculating the colors for the style templates
-        colorArr = /(\d*\, \d*\, \d*)(, ([.\d]*))?/g.exec(
-          _window.getComputedStyle(el).color
-        ),
-        pxColor = "px rgba(" + colorArr[1] + ",",
-        alpha = colorArr[3] || 1;
+        node;
 
-      // running through characters and highlighting
+      el.innerHTML = ""; // cleaning the node
+      /**
+       * running through characters and highlighting
+       *
+       * NOTE:
+       * Below is a chain of comma-separated expressions expecting
+       * the loop to break once the last expression evaluates to 0/false.
+       * (source: https://stackoverflow.com/a/16830323/73323)
+       */
       while (
         ((prev2 = prev1),
         // escaping if needed (with except for comments)
@@ -81,13 +76,13 @@
           [
             // finalize conditions for other token types
             // 0: whitespaces
-            /\S/[test](chr), // merged together
+            /\S/.test(chr), // merged together
             // 1: operators
             1, // consist of a single character
             // 2: braces
             1, // consist of a single character
             // 3: (key)word
-            !/[$\w]/[test](chr),
+            !/[$\w]/.test(chr),
             // 4: regex
             (prev1 == "/" || prev1 == "\n") && multichar,
             // 5: string with "
@@ -104,43 +99,40 @@
           if (token) {
             // remapping token type into style
             // (some types are highlighted similarly)
-            el[appendChild](
-              (node = _document.createElement("span"))
-            ).setAttribute(
-              "data_microlight_type",
-              [
-                // 0: not formatted
-                "not-formatted",
-                // 1: keywords
-                "keywords",
-                // 2: punctuation
-                "punctuation",
-                // 3: strings and regexps
-                "strings-regex",
-                // 4: comments
-                "comments",
-              ][
-                // not formatted
-                !tokenType
-                  ? 0
-                  : // punctuation
-                  tokenType < 3
-                  ? 2
-                  : // comments
-                  tokenType > 6
-                  ? 4
-                  : // regex and strings
-                  tokenType > 3
-                  ? 3
-                  : // otherwise tokenType == 3, (key)word
-                    // (1 if regexp matches, 0 otherwise)
-                    +/^(a(bstract|lias|nd|rguments|rray|s(m|sert)?|uto)|b(ase|egin|ool(ean)?|reak|yte)|c(ase|atch|har|hecked|lass|lone|ompl|onst|ontinue)|de(bugger|cimal|clare|f(ault|er)?|init|l(egate|ete)?)|do|double|e(cho|ls?if|lse(if)?|nd|nsure|num|vent|x(cept|ec|p(licit|ort)|te(nds|nsion|rn)))|f(allthrough|alse|inal(ly)?|ixed|loat|or(each)?|riend|rom|unc(tion)?)|global|goto|guard|i(f|mp(lements|licit|ort)|n(it|clude(_once)?|line|out|stanceof|t(erface|ernal)?)?|s)|l(ambda|et|ock|ong)|m(icrolight|odule|utable)|NaN|n(amespace|ative|ext|ew|il|ot|ull)|o(bject|perator|r|ut|verride)|p(ackage|arams|rivate|rotected|rotocol|ublic)|r(aise|e(adonly|do|f|gister|peat|quire(_once)?|scue|strict|try|turn))|s(byte|ealed|elf|hort|igned|izeof|tatic|tring|truct|ubscript|uper|ynchronized|witch)|t(emplate|hen|his|hrows?|ransient|rue|ry|ype(alias|def|id|name|of))|u(n(checked|def(ined)?|ion|less|signed|til)|se|sing)|v(ar|irtual|oid|olatile)|w(char_t|hen|here|hile|ith)|xor|yield)$/[
-                      test
-                    ](token)
-              ]
-            );
+            el.appendChild(
+              (node = document.createElement("span"))
+            ).className = [
+              // 0: not formatted
+              "token-not-formatted",
+              // 1: keywords
+              "token-keywords",
+              // 2: punctuation
+              "token-punctuation",
+              // 3: strings and regexps
+              "token-strings-regex",
+              // 4: comments
+              "token-comments",
+            ][
+              // not formatted
+              !tokenType
+                ? 0
+                : // punctuation
+                tokenType < 3
+                ? 2
+                : // comments
+                tokenType > 6
+                ? 4
+                : // regex and strings
+                tokenType > 3
+                ? 3
+                : // otherwise tokenType == 3, (key)word
+                  // (1 if regexp matches, 0 otherwise)
+                  +/^(a(bstract|lias|nd|rguments|rray|s(m|sert)?|uto)|b(ase|egin|ool(ean)?|reak|yte)|c(ase|atch|har|hecked|lass|lone|ompl|onst|ontinue)|de(bugger|cimal|clare|f(ault|er)?|init|l(egate|ete)?)|do|double|e(cho|ls?if|lse(if)?|nd|nsure|num|vent|x(cept|ec|p(licit|ort)|te(nds|nsion|rn)))|f(allthrough|alse|inal(ly)?|ixed|loat|or(each)?|riend|rom|unc(tion)?)|global|goto|guard|i(f|mp(lements|licit|ort)|n(it|clude(_once)?|line|out|stanceof|t(erface|ernal)?)?|s)|l(ambda|et|ock|ong)|m(icrolight|odule|utable)|NaN|n(amespace|ative|ext|ew|il|ot|ull)|o(bject|perator|r|ut|verride)|p(ackage|arams|rivate|rotected|rotocol|ublic)|r(aise|e(adonly|do|f|gister|peat|quire(_once)?|scue|strict|try|turn))|s(byte|ealed|elf|hort|igned|izeof|tatic|tring|truct|ubscript|uper|ynchronized|witch)|t(emplate|hen|his|hrows?|ransient|rue|ry|ype(alias|def|id|name|of))|u(n(checked|def(ined)?|ion|less|signed|til)|se|sing)|v(ar|irtual|oid|olatile)|w(char_t|hen|here|hile|ith)|xor|yield)$/.test(
+                    token
+                  )
+            ];
 
-            node[appendChild](_document.createTextNode(token));
+            node.appendChild(document.createTextNode(token));
           }
 
           // saving the previous token type
@@ -159,9 +151,9 @@
             ![
               1, //  0: whitespace
               //  1: operator or braces
-              /[\/{}[(\-+*=<>:;|\\.,?!&@~]/[test](chr),
-              /[\])]/[test](chr), //  2: closing brace
-              /[$\w]/[test](chr), //  3: (key)word
+              /[\/{}[(\-+*=<>:;|\\.,?!&@~]/.test(chr),
+              /[\])]/.test(chr), //  2: closing brace
+              /[$\w]/.test(chr), //  3: (key)word
               chr == "/" && //  4: regex
                 // previous token was an
                 // opening brace or an
@@ -189,9 +181,10 @@
 
   exports.reset = reset;
 
-  if (_document.readyState == "complete") {
-    reset();
+  if (document.readyState === "complete") {
+    // runs when async loading this script
+    requestAnimationFrame(reset);
   } else {
-    _window.addEventListener("load", reset, 0);
+    window.addEventListener("load", reset);
   }
 });

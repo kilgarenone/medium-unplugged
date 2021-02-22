@@ -238,13 +238,9 @@ extensionApi.webRequest.onBeforeRequest.addListener(
                       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
                     </head>
                     <body>${article.outerHTML}
-                    <div class='microlight'>/* Javascript */
-                    'use strict'
-
-                    const app = require('express')()
-                    const compression = require('compression')
-
-                        app.use(compression())
+                    <div class='microlight'>
+                    /* Javascript */
+                    <span>const config = {<br> plugins: [<br>  [<br>   'transform-imports',<br>   {<br>    'lodash-es': {<br>     transform: 'lodash/member',<br>     preventFullImport: true<br>    },<br>    'react-bootstrap': {<br>     transform: 'react-bootstrap/es/member', // The es folder contains es2015 module versions of the files<br>     preventFullImport: true<br>    }<br>   }<br>  ]<br> ]<br>};</span>
                     </div>
                     </body>
                     </html>`;
