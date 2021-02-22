@@ -181,10 +181,15 @@
 
   exports.reset = reset;
 
-  if (document.readyState === "complete") {
-    // runs when async loading this script
-    requestAnimationFrame(reset);
-  } else {
-    window.addEventListener("load", reset);
-  }
+  // if (document.readyState === "complete") {
+  //   // runs when async loading this script
+  //   requestAnimationFrame(reset);
+  // } else {
+  //   window.addEventListener("load", reset);
+  // }
+
+  document.addEventListener("highlightCode", function (e) {
+    var data = e.detail;
+    console.log("received", data);
+  });
 });

@@ -238,10 +238,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
                       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
                     </head>
                     <body>${article.outerHTML}
-                    <div class='microlight'>
-                    /* Javascript */
-                    <span>const config = {<br> plugins: [<br>  [<br>   'transform-imports',<br>   {<br>    'lodash-es': {<br>     transform: 'lodash/member',<br>     preventFullImport: true<br>    },<br>    'react-bootstrap': {<br>     transform: 'react-bootstrap/es/member', // The es folder contains es2015 module versions of the files<br>     preventFullImport: true<br>    }<br>   }<br>  ]<br> ]<br>};</span>
-                    </div>
+                    <pre id="haha" data-is-leaving="true"><span id="101b" class="ev lw js hj lx b cr ly lz s ma">// Babel Transform Imports</span><span id="9fdf" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// Babel config</span><span id="5725" class="ev lw js hj lx b cr mb mc md me mf lz s ma">const config = {<br> plugins: [<br>  [<br>   'transform-imports',<br>   {<br>    'lodash-es': {<br>     transform: 'lodash/member',<br>     preventFullImport: true<br>    },<br>    'react-bootstrap': {<br>     transform: 'react-bootstrap/es/member', // The es folder contains es2015 module versions of the files<br>     preventFullImport: true<br>    }<br>   }<br>  ]<br> ]<br>};</span><span id="3734" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// Full imports of these libraries are no longer allowed and will cause errors</span><span id="c203" class="ev lw js hj lx b cr mb mc md me mf lz s ma">import _ from 'lodash-es';</span><span id="fe95" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// Named imports are still allowed</span><span id="3ab7" class="ev lw js hj lx b cr mb mc md me mf lz s ma">import { debounce } from 'loash-es';</span><span id="c776" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// However, these named imports get compiled by Babel to look like this</span><span id="2a5e" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// import debounce from 'lodash-es/debounce';</span></pre>
                     </body>
                     </html>`;
       // finally pass it to rendering engine

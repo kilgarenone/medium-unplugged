@@ -25,5 +25,5 @@
     "https://*.medium.com/*",
     "https://gist.github.com/*"
   ],
-  "web_accessible_resources": ["worker.js", "syntax-highlighter.js"]
+  "web_accessible_resources": ["worker.js"]
 }
