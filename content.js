@@ -60,7 +60,8 @@ const observer = new IntersectionObserver(function (entries, self) {
     entry.target.dataset.isLeaving = true;
 
     if (entry.target.nodeName === "PRE") {
-      // TODO: highlight the code block
+      requestAnimationFrame(() => highlightCode(entry.target));
+      console.log("after highlightCode");
       continue;
     }
 
@@ -168,29 +169,39 @@ function initOnDomReady() {
   });
 
   // observe code blocks to be lazily syntax-highlighted
-  // const codeBlocks = document.getElementsByTagName("pre");
-  // if (codeBlocks.length) {
-  //   const script = document.createElement("script");
-  //   script.src = extensionApi.runtime.getURL("syntax-highlighter.js");
-  //   // Append to the `head` element
-  //   document.head.appendChild(script);
-
-  //   script.onload = function () {
-  //     for (const code of codeBlocks) {
-  //       code && observer.observe(code);
-  //     }
-
-  //     this.remove();
-  //   };
-  // }
-  const haha = document.getElementById("haha");
-  let string = [];
-  Array.from(haha.children).forEach((ele) => string.push(ele.innerText));
-  haha.innerHTML = "";
-  haha.appendChild(codeHighlighter(string.join("\n")));
+  const codeBlocks = document.getElementsByTagName("pre");
+  if (codeBlocks.length) {
+    for (const code of codeBlocks) {
+      code && observer.observe(code);
+    }
+  }
 }
 
-function codeHighlighter(code) {
+function highlightCode(codeBlock) {
+  codeHighlighter(getAllCodes(codeBlock)).then((highlightedCodeBlock) =>
+    codeBlock.appendChild(highlightedCodeBlock)
+  );
+}
+
+function getAllCodes(codeEle) {
+  console.log("inside getAllCodes");
+
+  const codes = [];
+  Array.from(codeEle.children).forEach((ele) => codes.push(ele.innerText));
+  codeEle.innerHTML = "";
+  return codes.join("\n");
+}
+/**
+ * @fileoverview microlight - syntax highlightning library
+ * @version 0.0.1
+ *
+ * @license MIT, see http://github.com/asvd/microlight
+ * @copyright 2016 asvd <heliosframework@gmail.com>
+ *
+ */
+async function codeHighlighter(code) {
+  console.log("inside codeHighlighter");
+
   const el = document.createDocumentFragment();
   // let el; // current microlighted element to run through
   // dynamic set of nodes to highlight
@@ -222,7 +233,6 @@ function codeHighlighter(code) {
     multichar,
     node;
 
-  // el.innerHTML = ""; // cleaning the node
   /**
    * running through characters and highlighting
    *
