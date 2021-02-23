@@ -61,7 +61,6 @@ const observer = new IntersectionObserver(function (entries, self) {
 
     if (entry.target.nodeName === "PRE") {
       requestAnimationFrame(() => highlightCode(entry.target));
-      console.log("after highlightCode");
       continue;
     }
 
@@ -71,9 +70,10 @@ const observer = new IntersectionObserver(function (entries, self) {
         .then(handleMediaRefResults)
         .then((res) => insertMedia(res, entry.target))
         .catch(onError);
-    } else {
-      entry.target.src = entry.target.getAttribute("data-src");
     }
+
+    const dataSrc = entry.target.getAttribute("data-src");
+    if (dataSrc) entry.target.src = dataSrc;
   }
 }, config);
 
@@ -120,7 +120,6 @@ worker.onmessage = async ({ data }) => {
 
     if (iFrameRef) {
       paragraphs[order].setAttribute("data-ref", iFrameRef);
-      // TODO: reset <figure/> style
       paragraphs[
         order
       ].style.cssText = `position: relative; height: ${height}; width: ${width}; margin: 0`;
@@ -184,8 +183,6 @@ function highlightCode(codeBlock) {
 }
 
 function getAllCodes(codeEle) {
-  console.log("inside getAllCodes");
-
   const codes = [];
   Array.from(codeEle.children).forEach((ele) => codes.push(ele.innerText));
   codeEle.innerHTML = "";
@@ -200,8 +197,6 @@ function getAllCodes(codeEle) {
  *
  */
 async function codeHighlighter(code) {
-  console.log("inside codeHighlighter");
-
   const el = document.createDocumentFragment();
   // let el; // current microlighted element to run through
   // dynamic set of nodes to highlight

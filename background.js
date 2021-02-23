@@ -105,151 +105,151 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
     let domString = "";
     filter.ondata = (event) => {
-      domString += decoder.decode(event.data, { stream: true });
+      console.log("event:", event.data);
+      // domString += decoder.decode(event.data, { stream: true });
     };
 
-    filter.onstop = (event) => {
-      initArticleState(details.tabId);
-      // parse DOMString into a DOM tree
-      let html = convertToDom(domString);
+    filter.onstop = (event) => {};
+    // filter.onstop = (event) => {
+    //   initArticleState(details.tabId);
+    //   // parse DOMString into a DOM tree
+    //   let html = convertToDom(domString);
 
-      for (const script of html.querySelectorAll(
-        "script:not([src]):not([type])"
-      )) {
-        if (script) {
-          ARTICLES_STORE[details.tabId].scriptsContent.push(script.textContent);
-        }
-      }
+    //   for (const script of html.querySelectorAll(
+    //     "script:not([src]):not([type])"
+    //   )) {
+    //     if (script) {
+    //       ARTICLES_STORE[details.tabId].scriptsContent.push(script.textContent);
+    //     }
+    //   }
 
-      const metadata = html.querySelector('script[type="application/ld+json"]');
-      const article = html.getElementsByTagName("article")[0];
+    //   const metadata = html.querySelector('script[type="application/ld+json"]');
+    //   const article = html.querySelector("article");
 
-      try {
-        ARTICLES_STORE[details.tabId].metadata = JSON.parse(
-          metadata.textContent
-        );
-      } catch (error) {
-        console.error("Error parsing post metadata script content", error);
-      }
+    //   try {
+    //     ARTICLES_STORE[details.tabId].metadata = JSON.parse(
+    //       metadata.textContent
+    //     );
+    //   } catch (error) {
+    //     console.error("Error parsing post metadata script content", error);
+    //   }
 
-      // get the element of an article's title
-      const headline = article.querySelectorAll("h1")[0];
-      headline.className = "mu-headline";
+    //   // get the element of an article's title
+    //   const headline = article.querySelector("h1");
+    //   headline.className = "mu-headline";
 
-      const requestPathname = urlPathname(details.url);
+    //   const requestPathname = urlPathname(details.url);
 
-      const metaDataCont =
-        headline.nextElementSibling || headline.parentNode.nextElementSibling;
-      // get avatar
-      let profile = metaDataCont.querySelectorAll(
-        `a[href*="medium.com/?source=post_page"]`
-      );
+    //   const metaDataCont =
+    //     headline.nextElementSibling || headline.parentNode.nextElementSibling;
+    //   // get avatar
+    //   let profile = metaDataCont.querySelectorAll(
+    //     `a[href*="medium.com/?source=post_page"]`
+    //   );
 
-      if (!profile.length) {
-        profile = metaDataCont.querySelectorAll(
-          `a[href^="/?source=post_page"]`
-        );
-      }
+    //   if (!profile.length) {
+    //     profile = metaDataCont.querySelectorAll(
+    //       `a[href^="/?source=post_page"]`
+    //     );
+    //   }
 
-      if (!profile.length) {
-        profile = metaDataCont.querySelectorAll(
-          `a[href^="/${
-            requestPathname.split("/").filter(Boolean)[0]
-          }?source=post_page"]`
-        );
-      }
+    //   if (!profile.length) {
+    //     profile = metaDataCont.querySelectorAll(
+    //       `a[href^="/${
+    //         requestPathname.split("/").filter(Boolean)[0]
+    //       }?source=post_page"]`
+    //     );
+    //   }
 
-      // create profile container for avatar, author name, post metadata
-      const avatar = profile[0].querySelector("img");
-      avatar.width = 50;
-      avatar.height = 50;
-      avatar.style.borderRadius = "50%";
-      // get bigger avatar image for higher resolution
-      avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
-      avatar.style.marginRight = "9px";
+    //   // create profile container for avatar, author name, post metadata
+    //   const avatar = profile[0].querySelector("img");
+    //   avatar.width = 50;
+    //   avatar.height = 50;
+    //   avatar.style.borderRadius = "50%";
+    //   // get bigger avatar image for higher resolution
+    //   avatar.src = avatar.src.replace(/\d+\/\d+/, "120/120");
+    //   avatar.style.marginRight = "9px";
 
-      const authorName = document.createElement("a");
-      authorName.textContent = profile[1].textContent;
-      // set href to point to author's medium page
-      authorName.href = profile[0].href.replace(/\?source=post_page.*/, "");
+    //   const authorName = document.createElement("a");
+    //   authorName.textContent = profile[1].textContent;
+    //   // set href to point to author's medium page
+    //   authorName.href = profile[0].href.replace(/\?source=post_page.*/, "");
 
-      const postedAtDate = document.createElement("div");
-      postedAtDate.textContent = metaDataCont
-        .querySelector(`a[href*="${requestPathname}?source=post_page"]`)
-        .textContent.split("·")[0];
-      postedAtDate.className = "mu-post-date";
+    //   const postedAtDate = document.createElement("div");
+    //   postedAtDate.textContent = metaDataCont
+    //     .querySelector(`a[href*="${requestPathname}?source=post_page"]`)
+    //     .textContent.split("·")[0];
+    //   postedAtDate.className = "mu-post-date";
 
-      const profileCont = document.createElement("div");
-      profileCont.style.cssText = `display: flex; align-items: center`;
-      profileCont.innerHTML = `${avatar.outerHTML}
-                              <div>
-                                ${authorName.outerHTML}
-                                ${postedAtDate.outerHTML}
-                              </div>`;
+    //   const profileCont = document.createElement("div");
+    //   profileCont.style.cssText = `display: flex; align-items: center`;
+    //   profileCont.innerHTML = `${avatar.outerHTML}
+    //                           <div>
+    //                             ${authorName.outerHTML}
+    //                             ${postedAtDate.outerHTML}
+    //                           </div>`;
 
-      // remove action buttons- share post, bookmark
-      removeElement(metaDataCont.querySelector("div"));
+    //   // remove action buttons- share post, bookmark
+    //   removeElement(metaDataCont.querySelector("div"));
 
-      // remove all images' placeholder
-      const allImages = article.querySelectorAll("img:not([srcset])");
-      for (const img of allImages) {
-        removeElement(img);
-      }
+    //   // remove all images' placeholder
+    //   const allImages = article.querySelectorAll("img:not([srcset])");
+    //   for (const img of allImages) {
+    //     removeElement(img);
+    //   }
 
-      // get post's images and unwrap them from the noscript tag
-      const allImagesWithSrcSet = article.querySelectorAll("figure");
-      for (const img of allImagesWithSrcSet) {
-        unwrapImg(img, details.tabId);
-      }
+    //   // get post's images and unwrap them from the noscript tag
+    //   const allImagesWithSrcSet = article.querySelectorAll("figure");
+    //   for (const img of allImagesWithSrcSet) {
+    //     unwrapImg(img, details.tabId);
+    //   }
 
-      // remove the <section/> used to contain 'you have red 3 article this month...'
-      removeElement(article.firstElementChild);
+    //   // remove the <section/> used to contain 'you have red 3 article this month...'
+    //   removeElement(article.firstElementChild);
 
-      // assign a classname to all paragraphs for later query for emded insertion mainly
-      article.querySelectorAll("section > div > div").forEach((div) => {
-        div.className = "mu-section";
-        const children = Array.from(div.children);
-        if (!children.length) return;
-        children.forEach((node) => node.classList.add("mu-p"));
-      });
+    //   // assign a classname to all paragraphs for later query for emded insertion mainly
+    //   article.querySelectorAll("section > div > div").forEach((div) => {
+    //     div.className = "mu-section";
+    //     const children = Array.from(div.children);
+    //     if (!children.length) return;
+    //     children.forEach((node) => node.classList.add("mu-p"));
+    //   });
 
-      // convert Medium's link card to a simple anchor link with text
-      const links = article.querySelectorAll(".mu-p > a > div > div > h2");
-      if (links.length) {
-        links.forEach((ele) => {
-          const a = ele.parentNode.parentNode.parentNode;
-          a.parentNode.classList.add("mu-link");
-          a.textContent = ele.textContent;
-        });
-      }
-      // console.log(
-      //   "article:",
-      //   Array.from(html.getElementsByClassName("mu-p"))
-      // );
+    //   // convert Medium's link card to a simple anchor link with text
+    //   const links = article.querySelectorAll(".mu-p > a > div > div > h2");
+    //   if (links.length) {
+    //     links.forEach((ele) => {
+    //       const a = ele.parentNode.parentNode.parentNode;
+    //       a.parentNode.classList.add("mu-link");
+    //       a.textContent = ele.textContent;
+    //     });
+    //   }
+    //   // console.log(
+    //   //   "article:",
+    //   //   Array.from(html.getElementsByClassName("mu-p"))
+    //   // );
 
-      // prepend the profile section to the top of an article
-      headline.parentNode.insertBefore(profileCont, headline);
+    //   // prepend the profile section to the top of an article
+    //   headline.parentNode.insertBefore(profileCont, headline);
 
-      // TODO: inline content.css into <style></style>
-      const page = `<html>
-                    <head>
-                      <meta charset="UTF-8">
-                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-                    </head>
-                    <body>${article.outerHTML}
-                    <pre id="haha" data-is-leaving="true"><span id="101b" class="ev lw js hj lx b cr ly lz s ma">// Babel Transform Imports</span><span id="9fdf" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// Babel config</span><span id="5725" class="ev lw js hj lx b cr mb mc md me mf lz s ma">const config = {<br> plugins: [<br>  [<br>   'transform-imports',<br>   {<br>    'lodash-es': {<br>     transform: 'lodash/member',<br>     preventFullImport: true<br>    },<br>    'react-bootstrap': {<br>     transform: 'react-bootstrap/es/member', // The es folder contains es2015 module versions of the files<br>     preventFullImport: true<br>    }<br>   }<br>  ]<br> ]<br>};</span><span id="3734" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// Full imports of these libraries are no longer allowed and will cause errors</span><span id="c203" class="ev lw js hj lx b cr mb mc md me mf lz s ma">import _ from 'lodash-es';</span><span id="fe95" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// Named imports are still allowed</span><span id="3ab7" class="ev lw js hj lx b cr mb mc md me mf lz s ma">import { debounce } from 'loash-es';</span><span id="c776" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// However, these named imports get compiled by Babel to look like this</span><span id="2a5e" class="ev lw js hj lx b cr mb mc md me mf lz s ma">// import debounce from 'lodash-es/debounce';</span></pre>
-                    </body>
-                    </html>`;
-      // finally pass it to rendering engine
-      filter.write(encoder.encode(page));
+    //   // TODO: inline content.css into <style></style>
+    //   const page = `<html>
+    //                 <head>
+    //                   <meta charset="UTF-8">
+    //                   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    //                   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    //                 </head>
+    //                 <body>${article.outerHTML}</body>
+    //                 </html>`;
+    //   // finally pass it to rendering engine
+    //   filter.write(encoder.encode(page));
 
-      // clean up memory(?)
-      html = null;
+    //   // clean up memory(?)
+    //   html = null;
 
-      console.log("finished");
-      filter.disconnect();
-    };
+    //   console.log("finished");
+    //   filter.disconnect();
+    // };
   },
   {
     urls,
