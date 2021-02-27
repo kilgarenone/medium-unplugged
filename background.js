@@ -26,16 +26,27 @@ let settings = {};
 
 browser.runtime.onMessage.addListener(handleMessageFromContent);
 
-// Get the settings
-browser.storage.sync.get(null, function (items) {
-  settings = items;
-});
+function initSettings() {
+  // Get the settings
+  browser.storage.sync.get(null, function (items) {
+    settings = items;
+  });
+}
 
 browser.storage.onChanged.addListener(function (changes) {
-  if (changes.isExtensionActive) {
+  if (changes.isExtensionActive && changes.isExtensionActive.newValue) {
     settings.isExtensionActive = changes.isExtensionActive.newValue;
 
     browser.tabs.reload();
+  }
+});
+
+// Set default settings on install
+browser.runtime.onInstalled.addListener(function (details) {
+  if (details.reason === "install") {
+    browser.storage.sync.set({ isExtensionActive: true }, function () {
+      initSettings();
+    });
   }
 });
 
