@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+          helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial,
+          sans-serif;
+        font-size: 20px;
+        padding: 15px;
+      }
+      .toggle {
+        -moz-appearance: none;
+        appearance: none;
+        width: 62px;
+        height: 32px;
+        display: inline-block;
+        position: relative;
+        border-radius: 50px;
+        overflow: hidden;
+        cursor: pointer;
+        background-color: #707070;
+        transition: background-color ease 0.3s;
+      }
+
+      .toggle:before {
+        content: "";
+        display: block;
+        position: absolute;
+        z-index: 2;
+        width: 28px;
+        height: 28px;
+        background: #fff;
+        left: 2px;
+        top: 2px;
+        border-radius: 50%;
+        color: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        transition: left 0.3s;
+      }
+
+      .toggle:checked {
+        background-color: #4cd964;
+      }
+
+      .toggle:checked:before {
+        left: 32px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <label for="onOff" class="switch">
+        <p>Turn ON/OFF</p>
+      </label>
+    </div>
+    <script src="common.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

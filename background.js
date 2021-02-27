@@ -1,19 +1,15 @@
 "use strict";
+// Shortcut for document.querySelector()
+function $(sel, el = document) {
+  return el.querySelector(sel);
+}
+
+// Shortcut for document.querySelectorAll()
+function $$(sel, el = document) {
+  return el.querySelectorAll(sel);
+}
 
 const urls = ["https://medium.com/*", "https://*.medium.com/*"];
-
-const extensionApi =
-  typeof browser === "object" &&
-  typeof browser.runtime === "object" &&
-  typeof browser.runtime.getManifest === "function"
-    ? browser
-    : typeof chrome === "object" &&
-      typeof chrome.runtime === "object" &&
-      typeof chrome.runtime.getManifest === "function"
-    ? chrome
-    : console.log(
-        'Cannot find extensionApi under namespace "browser" or "chrome"'
-      );
 
 function onError(error) {
   console.error(`Error: ${error}`);
@@ -45,7 +41,7 @@ function initArticleState(tabId) {
 }
 
 function unwrapImg(dom, tabId) {
-  const img = dom.querySelector("img");
+  const img = $("img", dom);
 
   if (!img) {
     return;
@@ -67,7 +63,7 @@ function unwrapImg(dom, tabId) {
 
   imgContainer.appendChild(img);
 
-  const figCaption = dom.querySelector("figcaption");
+  const figCaption = $("figcaption", dom);
   if (figCaption) {
     figCaption.style.textAlign = "center";
     dom.insertBefore(imgContainer, figCaption);
@@ -114,16 +110,14 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // parse DOMString into a DOM tree
       let html = convertToDom(domString);
 
-      for (const script of html.querySelectorAll(
-        "script:not([src]):not([type])"
-      )) {
+      for (const script of $$("script:not([src]):not([type])", html)) {
         if (script) {
           ARTICLES_STORE[details.tabId].scriptsContent.push(script.textContent);
         }
       }
 
-      const metadata = html.querySelector('script[type="application/ld+json"]');
-      const article = html.querySelector("article");
+      const metadata = $('script[type="application/ld+json"]', html);
+      const article = $("article", html);
 
       try {
         ARTICLES_STORE[details.tabId].metadata = JSON.parse(
@@ -134,34 +128,16 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       }
 
       // get the element of an article's title
-      const headline = article.querySelector("h1");
+      const headline = $("h1", article);
       headline.className = "mu-headline";
 
       const requestPathname = urlPathname(details.url);
 
       const metaDataCont =
         headline.nextElementSibling || headline.parentNode.nextElementSibling;
-      // get avatar
-      let profile = metaDataCont.querySelectorAll(
-        `a[href*="medium.com/?source=post_page"]`
-      );
-
-      if (!profile.length) {
-        profile = metaDataCont.querySelectorAll(
-          `a[href^="/?source=post_page"]`
-        );
-      }
-
-      if (!profile.length) {
-        profile = metaDataCont.querySelectorAll(
-          `a[href^="/${
-            requestPathname.split("/").filter(Boolean)[0]
-          }?source=post_page"]`
-        );
-      }
 
       // create profile container for avatar, author name, post metadata
-      const avatar = profile[0].querySelector("img");
+      const avatar = $("img", metaDataCont);
       avatar.width = 50;
       avatar.height = 50;
       avatar.style.borderRadius = "50%";
@@ -170,14 +146,20 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       avatar.style.marginRight = "9px";
 
       const authorName = document.createElement("a");
-      authorName.textContent = profile[1].textContent;
+      authorName.textContent = avatar.getAttribute("alt");
       // set href to point to author's medium page
-      authorName.href = profile[0].href.replace(/\?source=post_page.*/, "");
+      authorName.href = avatar.parentNode.href.replace(
+        /moz-extension:\/\/.+(\/.+)\?source=.+/,
+        function (a, b) {
+          return b; // the matched group in the bracket
+        }
+      );
 
       const postedAtDate = document.createElement("div");
-      postedAtDate.textContent = metaDataCont
-        .querySelector(`a[href*="${requestPathname}?source=post_page"]`)
-        .textContent.split("·")[0];
+      postedAtDate.textContent = $(
+        `[href*="${requestPathname}?source=post_page"]`,
+        metaDataCont
+      ).textContent.split("·")[0];
       postedAtDate.className = "mu-post-date";
 
       const profileCont = document.createElement("div");
@@ -189,16 +171,16 @@ extensionApi.webRequest.onBeforeRequest.addListener(
                               </div>`;
 
       // remove action buttons- share post, bookmark
-      removeElement(metaDataCont.querySelector("div"));
+      removeElement($("div", metaDataCont));
 
       // remove all images' placeholder
-      const allImages = article.querySelectorAll("img:not([srcset])");
+      const allImages = $$("img:not([srcset])", article);
       for (const img of allImages) {
         removeElement(img);
       }
 
       // get post's images and unwrap them from the noscript tag
-      const allImagesWithSrcSet = article.querySelectorAll("figure");
+      const allImagesWithSrcSet = $$("figure", article);
       for (const img of allImagesWithSrcSet) {
         unwrapImg(img, details.tabId);
       }
@@ -207,7 +189,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       removeElement(article.firstElementChild);
 
       // assign a classname to all paragraphs for later query for emded insertion mainly
-      article.querySelectorAll("section > div > div").forEach((div) => {
+      $$("section > div > div", article).forEach((div) => {
         div.className = "mu-section";
         const children = Array.from(div.children);
         if (!children.length) return;
@@ -215,7 +197,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       });
 
       // convert Medium's link card to a simple anchor link with text
-      const links = article.querySelectorAll(".mu-p > a > div > div > h2");
+      const links = $$(".mu-p > a > div > div > h2", article);
       if (links.length) {
         links.forEach((ele) => {
           const a = ele.parentNode.parentNode.parentNode;
@@ -223,10 +205,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
           a.textContent = ele.textContent;
         });
       }
-      // console.log(
-      //   "article:",
-      //   Array.from(html.getElementsByClassName("mu-p"))
-      // );
 
       // prepend the profile section to the top of an article
       headline.parentNode.insertBefore(profileCont, headline);
@@ -246,7 +224,6 @@ extensionApi.webRequest.onBeforeRequest.addListener(
       // clean up memory(?)
       html = null;
 
-      console.log("finished");
       filter.disconnect();
     };
   },

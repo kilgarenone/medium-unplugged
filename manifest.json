@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "Load Medium articles faster and leaner",
   "icons": {
-    "48": "icons/border-48.png"
+    "128": "medium-unplugged.svg"
   },
   "content_scripts": [
     {
@@ -15,12 +15,23 @@
     }
   ],
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["common.js", "background.js"]
   },
-  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "browser_action": {
+    "default_icon": "medium-unplugged.svg",
+    "default_title": "Medium Unplugged",
+    "default_popup": "popup.html",
+    "browser_style": true
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "mediumunplugged@mediumunplugged"
+    }
+  },
   "permissions": [
     "webRequest",
     "webRequestBlocking",
+    "storage",
     "https://medium.com/*",
     "https://*.medium.com/*",
     "https://gist.github.com/*"
