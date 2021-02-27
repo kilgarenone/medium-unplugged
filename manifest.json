@@ -1,6 +1,10 @@
 {
   "manifest_version": 2,
-  "name": "medium-unplugged",
+  "name": "Medium Unplugged",
+  "developer": {
+    "name": "Kheoh Yee Wei",
+    "url": "https://kheohyeewei.com"
+  },
   "version": "1.0",
   "description": "Load Medium articles faster and leaner",
   "icons": {

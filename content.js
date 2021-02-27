@@ -2,24 +2,11 @@
 
 const domParser = new DOMParser();
 
-const extensionApi =
-  typeof browser === "object" &&
-  typeof browser.runtime === "object" &&
-  typeof browser.runtime.getManifest === "function"
-    ? browser
-    : typeof chrome === "object" &&
-      typeof chrome.runtime === "object" &&
-      typeof chrome.runtime.getManifest === "function"
-    ? chrome
-    : console.log(
-        'Cannot find extensionApi under namespace "browser" or "chrome"'
-      );
-
 function onError(error) {
   console.error(`Error in content: ${error}`);
 }
 
-const worker = new Worker(extensionApi.runtime.getURL("worker.js"));
+const worker = new Worker(browser.runtime.getURL("worker.js"));
 
 // https://docs.embed.ly/v1.0/docs/native
 window.addEventListener("message", function (e) {
@@ -157,11 +144,11 @@ worker.onmessage = async ({ data }) => {
 window.addEventListener("DOMContentLoaded", initOnDomReady, false);
 
 function initOnDomReady() {
-  extensionApi.runtime.sendMessage({
+  browser.runtime.sendMessage({
     event: "dom_loaded",
   });
 
-  extensionApi.runtime.onMessage.addListener(({ event, msg }) => {
+  browser.runtime.onMessage.addListener(({ event, msg }) => {
     if (event === "get_article_model") {
       worker.postMessage({ msg, hostname: window.location.hostname });
     }

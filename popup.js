@@ -1,36 +1,34 @@
 const toggleBtnCont = document.querySelector(".switch");
 
-extensionApi.storage.sync.get(null, function (items) {
-  const label = document.createElement("label");
-  label.setAttribute("for", "onOff");
-
+browser.storage.sync.get(null, function (items) {
+  const isExtensionEnabled = items.isExtensionActive;
   const slider = document.createElement("input");
   slider.className = "toggle";
   slider.setAttribute("type", "checkbox");
   slider.id = "onOff";
-  slider.checked = items.isExtensionActive;
+  slider.checked = isExtensionEnabled;
 
   const toggleStatusText = document.createElement("p");
   toggleStatusText.className = "toggle-text";
-  toggleStatusText.textContent = getStatusText(items.isExtensionActive);
+  toggleStatusText.textContent = `Extension is ${
+    isExtensionEnabled ? "enabled" : "disabled"
+  }`;
   toggleBtnCont.appendChild(slider);
   toggleBtnCont.appendChild(toggleStatusText);
-  console.log("items:", items);
 });
 
 toggleBtnCont.addEventListener("click", function (event) {
   if (event.target.tagName !== "INPUT") return;
-  console.log("e:", event);
-  extensionApi.storage.sync.set(
+
+  browser.storage.sync.set(
     { isExtensionActive: event.target.checked },
     function () {
-      document.getElementsByClassName(
-        "toggle-text"
-      )[0].textContent = getStatusText(event.target.checked);
+      document.getElementsByClassName("toggle-text")[0].textContent =
+        "Reloading page...";
+
+      setTimeout(() => {
+        window.close();
+      }, 1000);
     }
   );
 });
-
-function getStatusText(isEnabled) {
-  return `Extension is ${isEnabled ? "enabled" : "disabled"}`;
-}

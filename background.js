@@ -20,9 +20,24 @@ const domParser = new DOMParser();
 function convertToDom(domString) {
   return domParser.parseFromString(domString, "text/html");
 }
-const ARTICLES_STORE = {};
 
-extensionApi.runtime.onMessage.addListener(handleMessageFromContent);
+const ARTICLES_STORE = {};
+let settings = {};
+
+browser.runtime.onMessage.addListener(handleMessageFromContent);
+
+// Get the settings
+browser.storage.sync.get(null, function (items) {
+  settings = items;
+});
+
+browser.storage.onChanged.addListener(function (changes) {
+  if (changes.isExtensionActive) {
+    settings.isExtensionActive = changes.isExtensionActive.newValue;
+
+    browser.tabs.reload();
+  }
+});
 
 function handleMessageFromContent(msg, sender) {
   if (msg.event === "dom_loaded") {
@@ -76,8 +91,11 @@ let postState = {};
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 
-extensionApi.webRequest.onBeforeRequest.addListener(
+browser.webRequest.onBeforeRequest.addListener(
   function (details) {
+    // extension is disabled. BAU as per Medium Corp
+    if (!settings.isExtensionActive) return;
+
     if (/.+-\w{11,12}\?source=.+$/.test(details.url)) {
       return {
         redirectUrl: details.url.replace(/\?source=.+/, ""),
@@ -96,9 +114,7 @@ extensionApi.webRequest.onBeforeRequest.addListener(
 
     console.log("details:", details);
     // return { cancel: true };
-    const filter = extensionApi.webRequest.filterResponseData(
-      details.requestId
-    );
+    const filter = browser.webRequest.filterResponseData(details.requestId);
 
     let domString = "";
     filter.ondata = (event) => {
