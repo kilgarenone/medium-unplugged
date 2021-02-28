@@ -50,6 +50,8 @@ browser.runtime.onInstalled.addListener(function (details) {
   }
 });
 
+initSettings();
+
 function handleMessageFromContent(msg, sender) {
   if (msg.event === "dom_loaded") {
     browser.tabs
@@ -105,6 +107,7 @@ const encoder = new TextEncoder();
 browser.webRequest.onBeforeRequest.addListener(
   function (details) {
     // extension is disabled. BAU as per Medium Corp
+    console.log("settings:", settings);
     if (!settings.isExtensionActive) return;
 
     if (/.+-\w{11,12}\?source=.+$/.test(details.url)) {
@@ -267,7 +270,7 @@ function removeElement(targetedDom) {
 function urlPathname(url) {
   if (url && url.startsWith("http")) {
     try {
-      return new URL(url).pathname;
+      return decodeURIComponent(new URL(url).pathname);
     } catch (e) {
       console.log(`url not valid: ${url} error: ${e}`);
     }

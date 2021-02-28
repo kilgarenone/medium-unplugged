@@ -164,15 +164,17 @@ function initOnDomReady() {
 }
 
 function highlightCode(codeBlock) {
-  codeHighlighter(getAllCodes(codeBlock)).then((highlightedCodeBlock) =>
-    codeBlock.appendChild(highlightedCodeBlock)
-  );
+  codeHighlighter(getAllCodes(codeBlock)).then((highlightedCodeBlock) => {
+    requestIdleCallback(() => {
+      codeBlock.innerHTML = "";
+      codeBlock.appendChild(highlightedCodeBlock);
+    });
+  });
 }
 
 function getAllCodes(codeEle) {
   const codes = [];
   Array.from(codeEle.children).forEach((ele) => codes.push(ele.innerText));
-  codeEle.innerHTML = "";
   return codes.join("\n");
 }
 /**

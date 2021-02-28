@@ -51,7 +51,7 @@ img {
   --line-height: 1.5;
 
   line-height: var(--line-height);
-  font-size: calc(103% + 0.35vw);
+  font-size: 1.3rem;
   font-family: var(--font-sans);
   color: var(--color-black);
 }
@@ -284,6 +284,9 @@ pre {
   max-height: 35rem;
 }
 
+pre > * + *:not([class*="token"]) {
+  display: block;
+}
 .token-not-formatted {
   color: #e6db74;
 }
