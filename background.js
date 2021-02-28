@@ -30,13 +30,20 @@ function initSettings() {
   // Get the settings
   browser.storage.sync.get(null, function (items) {
     settings = items;
+    setExtensionTitle(items.isExtensionActive);
+  });
+}
+
+function setExtensionTitle(isActivated) {
+  browser.browserAction.setTitle({
+    title: `Medium Unplugged is ${isActivated ? "ON" : "OFF"}`,
   });
 }
 
 browser.storage.onChanged.addListener(function (changes) {
-  if (changes.isExtensionActive && changes.isExtensionActive.newValue) {
+  if (changes.isExtensionActive) {
     settings.isExtensionActive = changes.isExtensionActive.newValue;
-
+    setExtensionTitle(changes.isExtensionActive.newValue);
     browser.tabs.reload();
   }
 });
@@ -47,6 +54,18 @@ browser.runtime.onInstalled.addListener(function (details) {
     browser.storage.sync.set({ isExtensionActive: true }, function () {
       initSettings();
     });
+  }
+});
+
+browser.commands.onCommand.addListener(function (command) {
+  if (command === "turn-on-and-off") {
+    browser.storage.sync.set(
+      { isExtensionActive: !settings.isExtensionActive },
+      function () {
+        initSettings();
+        browser.tabs.reload();
+      }
+    );
   }
 });
 

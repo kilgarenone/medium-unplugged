@@ -41,5 +41,14 @@
     "https://*.medium.com/*",
     "https://gist.github.com/*"
   ],
-  "web_accessible_resources": ["worker.js"]
+  "web_accessible_resources": ["worker.js"],
+  "commands": {
+    "turn-on-and-off": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+M",
+        "mac": "Command+Alt+M"
+      },
+      "description": "Send a 'toggle-feature' event"
+    }
+  }
 }

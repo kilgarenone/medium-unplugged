@@ -319,9 +319,6 @@ pre > * + *:not([class*="token"]) {
   border-radius: 0.2em;
 }
 
-figure img {
-  box-shadow: 2px 0px 0.3rem rgba(180, 194, 221, 0.57);
-}
 figcaption {
   color: var(--color-mid-grey);
   font-size: var(--s-1);
