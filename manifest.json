@@ -49,6 +49,12 @@
         "mac": "Command+Alt+M"
       },
       "description": "Send a 'toggle-feature' event"
+    },
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Alt+Down",
+        "mac": "Command+Alt+Down"
+      }
     }
   }
 }

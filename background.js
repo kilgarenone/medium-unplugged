@@ -38,6 +38,9 @@ function setExtensionTitle(isActivated) {
   browser.browserAction.setTitle({
     title: `Medium Unplugged is ${isActivated ? "ON" : "OFF"}`,
   });
+  browser.browserAction.setBadgeText({
+    text: isActivated ? "" : "OFF",
+  });
 }
 
 browser.storage.onChanged.addListener(function (changes) {
