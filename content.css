@@ -196,6 +196,7 @@ blockquote {
   border-left: 0.125rem solid var(--color-grey);
   margin-left: var(--s1);
   font-style: italic;
+  font-family: Tahoma;
 }
 
 li > * {
