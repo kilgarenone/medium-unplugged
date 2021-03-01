@@ -148,9 +148,9 @@ h1 {
 }
 
 h2 {
-  --fluid-type-min: 1.2rem;
-  --fluid-type-max: 1.4rem;
-  --fluid-type-target: 0.5vw;
+  --fluid-type-min: 1.08rem;
+  --fluid-type-max: 1.15rem;
+  --fluid-type-target: 0.3vw;
 }
 
 h1 {

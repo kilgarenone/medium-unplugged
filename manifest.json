@@ -48,7 +48,7 @@
         "default": "Ctrl+Alt+M",
         "mac": "Command+Alt+M"
       },
-      "description": "Send a 'toggle-feature' event"
+      "description": "Keyboard shortcut to enable or disable extension"
     },
     "_execute_browser_action": {
       "suggested_key": {
