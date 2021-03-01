@@ -8,31 +8,17 @@
   font-family: inherit;
 }
 
-img {
-  max-width: 100%;
-}
-
 :root {
-  --color-black: #1c2334;
-  --color-dark-grey: #2c4252;
-  --color-mid-grey: #818e98;
-  --color-grey: #cdd2d6;
+  --color-black: #111;
+  --color-dark-grey: #37474f;
+  --color-mid-grey: #757575;
+  --color-grey: #ccc;
   --color-light-grey: #e6ebf0;
   --font-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir,
     helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial, sans-serif;
-  --font-serif: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
-    Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
-    Segoe UI Emoji, Segoe UI Symbol;
   --font-mono: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
     monospace;
   --ratio: 1.4;
-  --s-5: calc(
-    var(--s0) / var(--ratio) / var(--ratio) / var(--ratio) / var(--ratio) /
-      var(--ratio)
-  );
-  --s-4: calc(
-    var(--s0) / var(--ratio) / var(--ratio) / var(--ratio) / var(--ratio)
-  );
   --s-3: calc(var(--s0) / var(--ratio) / var(--ratio) / var(--ratio));
   --s-2: calc(var(--s0) / var(--ratio) / var(--ratio));
   --s-1: calc(var(--s0) / var(--ratio));
@@ -42,10 +28,6 @@ img {
   --s3: calc(var(--s0) * var(--ratio) * var(--ratio) * var(--ratio));
   --s4: calc(
     var(--s0) * var(--ratio) * var(--ratio) * var(--ratio) * var(--ratio)
-  );
-  --s5: calc(
-    var(--s0) * var(--ratio) * var(--ratio) * var(--ratio) * var(--ratio) *
-      var(--ratio)
   );
   --measure: 60ch;
   --line-height: 1.5;
@@ -101,6 +83,7 @@ body {
 .mu-link {
   --flow-space: var(--s-3);
 }
+
 .mu-link a {
   text-decoration: underline;
   font-weight: 600;
@@ -136,29 +119,13 @@ a:hover {
   background-color: var(--color-light-grey);
 }
 
-kbd {
-  display: inline-block;
-  padding: 3px 5px;
-  line-height: 10px;
-  color: #444d56;
-  vertical-align: middle;
-  background-color: #fafbfc;
-  border: 1px solid #d1d5da;
-  border-radius: 3px;
-  box-shadow: inset 0 -1px 0 #d1d5da;
-}
-
 h1,
-h2,
-h3,
-h4 {
+h2 {
   line-height: 1.15;
 }
 
 h1,
-h2,
-h3,
-h4 {
+h2 {
   font-size: clamp(
     var(--fluid-type-min, 1rem),
     calc(1rem + var(--fluid-type-target, 2vw)),
@@ -186,11 +153,6 @@ h2 {
   --fluid-type-target: 0.5vw;
 }
 
-h3 {
-  --fluid-type-min: 1.1rem;
-  --fluid-type-max: 1.3rem;
-}
-
 h1 {
   --flow-space: var(--s4);
 }
@@ -213,42 +175,27 @@ p + ul {
   --flow-space: var(--s-1);
 }
 
-h3 {
-  margin-top: var(--s2);
-  margin-bottom: var(--s-1);
-}
-
-h4 {
-  margin-top: var(--s2);
-  margin-bottom: var(--s-1);
-}
-
 code,
-kbd,
 pre {
   font-family: var(--font-mono);
   font-size: var(--s-1);
 }
 
 code {
-  padding: 0.15rem 0.25rem;
+  padding: 0.14rem 0.29rem;
   background-color: var(--color-light-grey);
-  border-radius: 0.3rem;
+  border-radius: 0.25rem;
   letter-spacing: 0.03ch;
+  color: var(--color-dark-grey);
+  font-weight: 700;
 }
 
 blockquote {
-  padding: 0 1rem;
+  padding: var(--s-3) 0 var(--s-1) var(--s-1);
   color: var(--color-mid-grey);
-  border-left: 0.24rem solid var(--color-dark-grey);
-}
-
-blockquote > :first-child {
-  margin-top: 0;
-}
-
-blockquote > :last-child {
-  margin-bottom: 0;
+  border-left: 0.125rem solid var(--color-grey);
+  margin-left: var(--s1);
+  font-style: italic;
 }
 
 li > * {
@@ -261,10 +208,8 @@ li + li {
 
 pre {
   padding: var(--s-1);
-  margin: var(--s-1) 0;
-  font-size: 0.8em;
-  border-radius: 0.3em;
-  color: #f8f8f2;
+  border-radius: 0.5rem;
+  color: var(--color-light-grey);
   background-color: #272822;
   text-shadow: 0 1px rgba(0, 0, 0, 0.3);
   text-align: left;
@@ -274,11 +219,8 @@ pre {
   word-wrap: normal;
   line-height: 1.5;
   -moz-tab-size: 4;
-  -o-tab-size: 4;
   tab-size: 4;
-  -webkit-hyphens: none;
   -moz-hyphens: none;
-  -ms-hyphens: none;
   hyphens: none;
   overflow: auto;
   max-height: 35rem;
@@ -287,6 +229,18 @@ pre {
 pre > * + *:not([class*="token"]) {
   display: block;
 }
+
+figcaption {
+  color: var(--color-mid-grey);
+  font-size: var(--s-1);
+  max-width: 56ch;
+  margin: 0 auto;
+}
+
+img {
+  max-width: 100%;
+}
+
 .token-not-formatted {
   color: #e6db74;
 }
@@ -305,23 +259,4 @@ pre > * + *:not([class*="token"]) {
 
 .token-comments {
   color: #8292a2;
-}
-
-.microlight {
-  font-family: monospace;
-  white-space: pre;
-  background-color: #263238;
-  color: #aabbc3;
-  padding: 15px;
-  text-align: left;
-  overflow-x: auto;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
-  border-radius: 0.2em;
-}
-
-figcaption {
-  color: var(--color-mid-grey);
-  font-size: var(--s-1);
-  max-width: 56ch;
-  margin: 0 auto;
 }
