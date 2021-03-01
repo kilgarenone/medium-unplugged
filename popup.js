@@ -1,4 +1,5 @@
-const toggleBtnCont = document.querySelector(".switch");
+const onOffTextEle = document.querySelector(".onOff-text");
+const onOffEle = document.querySelector(".onOff");
 
 browser.storage.sync.get(null, function (items) {
   const isExtensionEnabled = items.isExtensionActive;
@@ -13,11 +14,12 @@ browser.storage.sync.get(null, function (items) {
   toggleStatusText.textContent = `Extension is ${
     isExtensionEnabled ? "enabled" : "disabled"
   }`;
-  toggleBtnCont.appendChild(slider);
-  toggleBtnCont.appendChild(toggleStatusText);
+  toggleStatusText.style.color = "var(--color-mid-grey)";
+  onOffEle.appendChild(slider);
+  onOffTextEle.appendChild(toggleStatusText);
 });
 
-toggleBtnCont.addEventListener("click", function (event) {
+onOffEle.addEventListener("click", function (event) {
   if (event.target.tagName !== "INPUT") return;
 
   browser.storage.sync.set(

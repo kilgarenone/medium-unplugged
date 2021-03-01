@@ -3,12 +3,58 @@
   <head>
     <meta charset="utf-8" />
     <style>
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        overflow-wrap: break-word;
+        margin: 0;
+        border: 0 solid;
+        font-family: inherit;
+      }
+      :root {
+        --color-black: #3d3d3d;
+        --color-dark-grey: #37474f;
+        --color-mid-grey: #757575;
+        --color-grey: #ccc;
+        --color-light-grey: #e6ebf0;
+        --font-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir,
           helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial,
           sans-serif;
-        font-size: 20px;
-        padding: 15px;
+        --font-mono: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
+          monospace;
+        --ratio: 1.4;
+        --s-3: calc(var(--s0) / var(--ratio) / var(--ratio) / var(--ratio));
+        --s-2: calc(var(--s0) / var(--ratio) / var(--ratio));
+        --s-1: calc(var(--s0) / var(--ratio));
+        --s0: 1rem;
+        --s1: calc(var(--s0) * var(--ratio));
+        --s2: calc(var(--s0) * var(--ratio) * var(--ratio));
+        --s3: calc(var(--s0) * var(--ratio) * var(--ratio) * var(--ratio));
+        --s4: calc(
+          var(--s0) * var(--ratio) * var(--ratio) * var(--ratio) * var(--ratio)
+        );
+        --measure: 60ch;
+        --line-height: 1.5;
+
+        line-height: var(--line-height);
+        font-size: 1.3rem;
+        font-family: var(--font-sans);
+        color: var(--color-black);
+      }
+      .onOff {
+        padding: var(--s-1);
+      }
+      html,
+      body {
+        width: 300px;
+      }
+      p {
+        font-size: var(--s-1);
+      }
+
+      label {
+        cursor: pointer;
       }
       .toggle {
         -moz-appearance: none;
@@ -49,13 +95,24 @@
       }
     </style>
   </head>
-
   <body>
-    <h1>Medium Unplugged</h1>
-    <div>
-      <label for="onOff" class="switch">
-        <p>Turn ON/OFF</p>
-      </label>
+    <div
+      style="
+        padding: var(--s-2);
+        margin-bottom: var(--s-3);
+        background-color: var(--color-light-grey);
+      "
+    >
+      <h1 style="font-size: 0.8rem">Medium Unplugged</h1>
+    </div>
+    <div class="onOff" style="display: flex; justify-content: space-between">
+      <label for="onOff" class="onOff-text" style="display: block"
+        ><p
+          style="font-size: var(--s-1); font-weight: 600; margin-bottom: 0.2rem"
+        >
+          Turn ON/OFF
+        </p></label
+      >
     </div>
     <script src="popup.js"></script>
   </body>
