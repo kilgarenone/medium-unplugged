@@ -21,20 +21,11 @@
         --font-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir,
           helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial,
           sans-serif;
-        --font-mono: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
-          monospace;
         --ratio: 1.4;
         --s-3: calc(var(--s0) / var(--ratio) / var(--ratio) / var(--ratio));
         --s-2: calc(var(--s0) / var(--ratio) / var(--ratio));
         --s-1: calc(var(--s0) / var(--ratio));
         --s0: 1rem;
-        --s1: calc(var(--s0) * var(--ratio));
-        --s2: calc(var(--s0) * var(--ratio) * var(--ratio));
-        --s3: calc(var(--s0) * var(--ratio) * var(--ratio) * var(--ratio));
-        --s4: calc(
-          var(--s0) * var(--ratio) * var(--ratio) * var(--ratio) * var(--ratio)
-        );
-        --measure: 60ch;
         --line-height: 1.5;
 
         line-height: var(--line-height);
@@ -66,7 +57,7 @@
         border-radius: 50px;
         overflow: hidden;
         cursor: pointer;
-        background-color: #707070;
+        background-color: var(--color-grey);
         transition: background-color ease 0.3s;
       }
 

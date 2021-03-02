@@ -25,8 +25,7 @@ onOffEle.addEventListener("click", function (event) {
   browser.storage.sync.set(
     { isExtensionActive: event.target.checked },
     function () {
-      document.getElementsByClassName("toggle-text")[0].textContent =
-        "Reloading page...";
+      document.querySelector(".toggle-text").textContent = "Reloading page...";
 
       setTimeout(() => {
         window.close();
