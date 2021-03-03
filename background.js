@@ -88,19 +88,6 @@ browser.runtime.onInstalled.addListener(function (details) {
   }
 });
 
-// handle keyboard shortcut actions
-browser.commands.onCommand.addListener(function (command) {
-  if (command === "turn-on-and-off") {
-    browser.storage.sync.set(
-      { isExtensionActive: !settings.isExtensionActive },
-      function () {
-        initSettings();
-        browser.tabs.reload();
-      }
-    );
-  }
-});
-
 initSettings();
 
 function unwrapImg(dom, tabId) {

@@ -28,8 +28,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "mediumunplugged@mediumunplugged",
-      "strict_min_version": "85.0"
+      "id": "mediumunplugged@mediumunplugged"
     }
   },
   "permissions": [
@@ -40,20 +39,5 @@
     "https://*.medium.com/*",
     "https://gist.github.com/*"
   ],
-  "web_accessible_resources": ["worker.js"],
-  "commands": {
-    "turn-on-and-off": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+M",
-        "mac": "Command+Alt+M"
-      },
-      "description": "Keyboard shortcut to enable or disable extension"
-    },
-    "_execute_browser_action": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+Down",
-        "mac": "Command+Alt+Down"
-      }
-    }
-  }
+  "web_accessible_resources": ["worker.js"]
 }
