@@ -143,6 +143,7 @@ browser.webRequest.onBeforeRequest.addListener(
       };
     }
 
+    console.log("details:", details);
     // 1. only apply extension on 'path-name-ae4651dc07ba'
     // 2. allow favicon.ico request
     // 3. allow requests for static assets served by medium
@@ -155,8 +156,6 @@ browser.webRequest.onBeforeRequest.addListener(
     ) {
       return;
     }
-
-    console.log("details:", details);
 
     const filter = browser.webRequest.filterResponseData(details.requestId);
 
@@ -236,9 +235,6 @@ browser.webRequest.onBeforeRequest.addListener(
                                 ${postedAtDate.outerHTML}
                               </div>`;
 
-      // place the profile at the top of an article
-      headline.parentNode.insertBefore(profileCont, headline);
-
       // remove all the action buttons- share post, bookmark etc.
       removeElement($("div", metaDataCont));
 
@@ -247,6 +243,11 @@ browser.webRequest.onBeforeRequest.addListener(
       for (const img of allImages) {
         removeElement(img);
       }
+
+      // place the profile at the top of an article
+      // note: do this after the step of removing img tags without srcset
+      //      so it won't find our avatar img and delete it too
+      headline.parentNode.insertBefore(profileCont, headline);
 
       // get post's images and unwrap them from the noscript tag
       // https://gist.github.com/kilgarenone/a33fbc0fdb5309a5123506f805d5b04f#file-medium-html-dump-html-L2396-L2414

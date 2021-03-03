@@ -60,6 +60,8 @@ onmessage = function ({ data: { event, msg, hostname } }) {
 
     if (/^(P|IMG|H\d|IFRAME)$/.test(state[paragraphRef].type)) return true;
 
+    // to get unique <ol> and <ul> paragraphs. cuz their <li> each has an entry with <ol> or <ul> as the type in
+    // the 'paragraphs' object. hence comparing to last index to detect the repetition.
     if (state[paragraphRef].type === state[paragraphs[index - 1].__ref].type) {
       return false;
     }
@@ -68,6 +70,7 @@ onmessage = function ({ data: { event, msg, hostname } }) {
   });
 
   const mediaSlots = [];
+
   paragraphs.forEach(({ __ref: paragraphRefId }, index) => {
     const paragraph = state[paragraphRefId];
 

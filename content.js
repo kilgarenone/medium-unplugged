@@ -35,6 +35,7 @@ const config = {
   rootMargin: "0px", // no margin around our capturing frame(viewport in this case)
   threshold: 0.5, // when half of a target has intersected
 };
+
 const observer = new IntersectionObserver(function (entries, self) {
   for (const entry of entries) {
     if (!entry.isIntersecting) continue;
@@ -64,6 +65,7 @@ const observer = new IntersectionObserver(function (entries, self) {
   }
 }, config);
 
+// get the script that embeds gists
 function handleMediaRefResults(response) {
   return response
     .text()
@@ -76,15 +78,17 @@ function handleMediaRefResults(response) {
       // get the json representation of a gist
       return fetch(script.src.replace(/.js$/, ".json"));
     })
-    .then((scriptRes) => scriptRes.json());
+    .then((res) => res.json());
 }
 
 function insertMedia(media, paragraphEle) {
+  // insert gist's stylesheet link
   const styleSheet = document.createElement("link");
   styleSheet.setAttribute("href", media.stylesheet);
   styleSheet.setAttribute("rel", "stylesheet");
   document.getElementsByTagName("head")[0].appendChild(styleSheet);
   paragraphEle.style.cssText = "";
+  // html content of a gist
   paragraphEle.innerHTML = media.div;
 }
 
@@ -102,9 +106,11 @@ const loadingEle = `<div class="loading"
 worker.onmessage = async ({ data }) => {
   const paragraphs = Array.from(document.getElementsByClassName("mu-p"));
 
+  // insert src to elements as data-src for lazy-loading via IntersectionObserver
   data.forEach(({ iFrameSrc, iFrameRef, order, height, width }) => {
     paragraphs[order].innerHTML = loadingEle;
 
+    // for gist
     if (iFrameRef) {
       paragraphs[order].setAttribute("data-ref", iFrameRef);
       paragraphs[
@@ -116,6 +122,7 @@ worker.onmessage = async ({ data }) => {
       return;
     }
 
+    // for other embeds
     const iframe = document.createElement("iframe");
     iframe.addEventListener("load", function () {
       // Hide the loading indicator
@@ -158,7 +165,7 @@ function initOnDomReady() {
   const codeBlocks = document.getElementsByTagName("pre");
   if (codeBlocks.length) {
     for (const code of codeBlocks) {
-      code && observer.observe(code);
+      observer.observe(code);
     }
   }
 }
@@ -174,9 +181,11 @@ function highlightCode(codeBlock) {
 
 function getAllCodes(codeEle) {
   const codes = [];
+  // innerText gives us all text content of an ele with whitespaces preserved. very cool.
   Array.from(codeEle.children).forEach((ele) => codes.push(ele.innerText));
   return codes.join("\n");
 }
+
 /**
  * @fileoverview microlight - syntax highlightning library
  * @version 0.0.1
