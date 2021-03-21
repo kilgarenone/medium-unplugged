@@ -181,6 +181,14 @@ browser.webRequest.onBeforeRequest.addListener(
 
       // get the element of an article's title
       const headline = $("h1", article);
+
+      // give in to medium if article's title is missing. could happen if its a comment page
+      if (!headline) {
+        filter.write(encoder.encode(domString));
+        filter.disconnect();
+        return;
+      }
+
       headline.className = "mu-headline";
 
       const metaDataCont =
