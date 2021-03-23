@@ -89,7 +89,7 @@ function insertMedia(media, paragraphEle) {
   document.getElementsByTagName("head")[0].appendChild(styleSheet);
   paragraphEle.style.cssText = "";
   // html content of a gist
-  paragraphEle.innerHTML = media.div;
+  paragraphEle.innerHTML = DOMPurify.sanitize(media.div);
 }
 
 const loadingEle = `<div class="loading"
@@ -108,7 +108,7 @@ worker.onmessage = async ({ data }) => {
 
   // insert src to elements as data-src for lazy-loading via IntersectionObserver
   data.forEach(({ iFrameSrc, iFrameRef, order, height, width }) => {
-    paragraphs[order].innerHTML = loadingEle;
+    paragraphs[order].innerHTML = DOMPurify.sanitize(loadingEle);
 
     // for gist
     if (iFrameRef) {
@@ -173,7 +173,7 @@ function initOnDomReady() {
 function highlightCode(codeBlock) {
   codeHighlighter(getAllCodes(codeBlock)).then((highlightedCodeBlock) => {
     requestIdleCallback(() => {
-      codeBlock.innerHTML = "";
+      codeBlock.innerText = "";
       codeBlock.appendChild(highlightedCodeBlock);
     });
   });

@@ -224,11 +224,13 @@ browser.webRequest.onBeforeRequest.addListener(
 
       const profileCont = document.createElement("div");
       profileCont.style.cssText = `display: flex; align-items: center`;
-      profileCont.innerHTML = `${avatar.outerHTML}
-                              <div>
-                                ${authorName.outerHTML}
-                                ${postedAtDate.outerHTML}
-                              </div>`;
+
+      const authorInfoCont = document.createElement("div");
+      authorInfoCont.appendChild(authorName);
+      authorInfoCont.appendChild(postedAtDate);
+
+      profileCont.appendChild(avatar);
+      profileCont.appendChild(authorInfoCont);
 
       // remove all the action buttons- share post, bookmark etc.
       removeElement($("div", metaDataCont));

@@ -5,7 +5,7 @@
     "name": "Kheoh Yee Wei",
     "url": "https://kheohyeewei.com"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Load Medium articles faster and leaner",
   "icons": {
     "128": "medium-unplugged.svg"
@@ -13,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["https://medium.com/*", "https://*.medium.com/*"],
-      "js": ["content.js"],
+      "js": ["purify.min.js", "content.js"],
       "run_at": "document_start"
     }
   ],
