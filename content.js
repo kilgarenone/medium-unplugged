@@ -92,16 +92,17 @@ function insertMedia(media, paragraphEle) {
   paragraphEle.innerHTML = DOMPurify.sanitize(media.div);
 }
 
-const loadingEle = `<div class="loading"
+const loadingEle = `<strong class="loading"
                         style="position: absolute;
+                                color: var(--color-mid-grey);
                                 left: 0;
-                                top: 0;
+                                top: 2em;
                                 height: 100%;
                                 width: 100%;
                                 text-align: center"
                     >
                       Loading embedded content...
-                    </div>`;
+                    </strong>`;
 
 worker.onmessage = async ({ data }) => {
   const paragraphs = Array.from(document.getElementsByClassName("mu-p"));
