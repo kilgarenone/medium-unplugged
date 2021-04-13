@@ -17,26 +17,26 @@ cd medium-unplugged
 code .
 ```
 
-### Development
+## Development
 
 There are two ways to develop:
 
 - `web-ext` package that auto-reload for you
 - Load your plugin in `about:debugging`
 
-#### web-ext
+### web-ext
 
 https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/
 
 However, in my experience, I found multiple times that when I save it didn't properly reload for me. YMMV.
 
-#### about:debugging
+### about:debugging
 
 https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension
 
 This is my preferred method. It is as robust as it can be.
 
-### Developing for Firefox Android
+## Developing for Firefox Android
 
 https://extensionworkshop.com/documentation/develop/developing-extensions-for-firefox-for-android/
 
@@ -44,7 +44,7 @@ It's quite complicated to setup, but just follow the instructions laid out in th
 
 Side note: you don't need to install the whole 'Android Studio' software meant for a full-blown native-app development. You just need the `sdkmanager` for what's at hand.
 
-### Build
+## Build
 
 When you are ready to publish or update your extension, you will need the `web-ext` package.
 
