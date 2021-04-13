@@ -36,7 +36,7 @@ const STYLE_SHEET = `
   --line-height: 1.5;
 
   line-height: var(--line-height);
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-family: var(--font-sans);
   color: var(--color-black);
 }
