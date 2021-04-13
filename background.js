@@ -91,7 +91,10 @@ browser.runtime.onInstalled.addListener(function (details) {
 initSettings();
 
 function unwrapImg(dom, tabId) {
-  const img = $("img", dom);
+  let img = $("img", dom);
+  let imgWithSrcSet = $("noscript > img", dom);
+
+  if (imgWithSrcSet) img = imgWithSrcSet;
 
   if (!img) return;
 
@@ -130,7 +133,6 @@ browser.webRequest.onBeforeRequest.addListener(
       };
     }
 
-    console.log("details:", details);
     // 1. only apply extension on 'path-name-ae4651dc07ba'
     // 2. allow favicon.ico request
     // 3. allow requests for static assets served by medium
@@ -233,12 +235,6 @@ browser.webRequest.onBeforeRequest.addListener(
 
       // remove all the action buttons- share post, bookmark etc.
       removeElement($("div", metaDataCont));
-
-      // remove the placeholder of all images
-      const allImages = $$("img:not([srcset])", article);
-      for (const img of allImages) {
-        removeElement(img);
-      }
 
       // place the profile at the top of an article
       // note: do this after the step of removing img tags without srcset
