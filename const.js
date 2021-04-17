@@ -92,6 +92,10 @@ body {
   font-weight: 600;
 }
 
+.paragraph-image {
+  margin-top: var(--s-1);
+}
+
 li ul {
   margin-top: var(--s-3);
 }
@@ -185,7 +189,7 @@ pre {
 }
 
 code {
-  padding: 0.14rem 0.29rem;
+  padding: 0.1rem 0.26rem;
   background-color: var(--color-light-grey);
   border-radius: 0.25rem;
   letter-spacing: 0.03ch;
