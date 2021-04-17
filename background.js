@@ -92,7 +92,10 @@ initSettings();
 
 function unwrapImg(dom, tabId) {
   let img = $("img", dom);
-  let imgWithSrcSet = $("noscript > img", dom);
+  const imgWithSrcSet = $("noscript > img", dom);
+  const figCaption = $("figcaption", dom);
+
+  if (figCaption) figCaption.style.textAlign = "center";
 
   if (imgWithSrcSet) img = imgWithSrcSet;
 
@@ -113,9 +116,7 @@ function unwrapImg(dom, tabId) {
   const div = dom.firstChild;
   if (div && div.nodeName === "DIV") removeElement(div);
 
-  const figCaption = $("figcaption", dom);
   if (figCaption) {
-    figCaption.style.textAlign = "center";
     dom.insertBefore(imgContainer, figCaption);
   } else {
     dom.appendChild(imgContainer);
