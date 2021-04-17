@@ -89,27 +89,28 @@ function insertMedia(media, paragraphEle) {
   document.getElementsByTagName("head")[0].appendChild(styleSheet);
   paragraphEle.style.cssText = "";
   // html content of a gist
-  paragraphEle.innerHTML = DOMPurify.sanitize(media.div);
+  const gist = document.createElement("div");
+  gist.innerHTML = DOMPurify.sanitize(media.div);
+  paragraphEle.insertBefore(gist, paragraphEle.firstChild);
 }
 
-const loadingEle = `<strong class="loading"
-                        style="position: absolute;
-                                color: var(--color-mid-grey);
-                                left: 0;
-                                top: 2em;
-                                height: 100%;
-                                width: 100%;
-                                text-align: center"
-                    >
-                      Loading embedded content...
-                    </strong>`;
+const loadingEle = document.createElement("strong");
+loadingEle.style.cssText = `position: absolute;
+                          color: var(--color-mid-grey);
+                          left: 0;
+                          top: 2em;
+                          height: 100%;
+                          width: 100%;
+                          text-align: center`;
+loadingEle.className = "loading";
+loadingEle.textContent = "Loading embedded content...";
 
 worker.onmessage = async ({ data }) => {
   const paragraphs = Array.from(document.getElementsByClassName("mu-p"));
 
   // insert src to elements as data-src for lazy-loading via IntersectionObserver
   data.forEach(({ iFrameSrc, iFrameRef, order, height, width }) => {
-    paragraphs[order].innerHTML = DOMPurify.sanitize(loadingEle);
+    paragraphs[order].insertBefore(loadingEle, paragraphs[order].firstChild);
 
     // for gist
     if (iFrameRef) {
