@@ -1,4 +1,4 @@
-# Medium Unplugged
+# Medium Unplugged :fishing_pole_and_fish:
 
 A Medium article is heavily loaded with Javascript that negatively affects the loading and reading experience of an end-user particularly those on constrained devices. To fix this situation, this Firefox browser plugin strips it to utmost minimum: The content.
 
