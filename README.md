@@ -4,7 +4,11 @@ A Medium article is heavily loaded with Javascript that negatively affects the l
 
 This plugin only works in Firefox due to the usage of a web-extension API called [`filterResponseData`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/filterResponseData) that's available nowhere else but Firefox. The API is the key to strip everything but the content before passes it to the renderer.
 
-## Download
+## Download extension
+https://addons.mozilla.org/en-US/firefox/addon/medium-unplugged/
+
+
+## Development
 
 ```bash
 # Download the repo
@@ -17,9 +21,7 @@ cd medium-unplugged
 code .
 ```
 
-## Development
-
-There are two ways to develop:
+Now, there are two ways to develop:
 
 - `web-ext` package that auto-reload for you
 - Load your plugin in `about:debugging`
@@ -55,3 +57,5 @@ web-ext build
 ```
 
 It will package your plugin in a `.zip` file which you will upload during the submission.
+
+:tent:
