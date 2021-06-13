@@ -2,7 +2,7 @@
 
 A Medium article is heavily loaded with Javascript that negatively affects the loading and reading experience of an end-user particularly those on constrained devices. To fix this situation, this Firefox browser plugin strips it to utmost minimum: The content.
 
-This plugin only works in Firefox due to the usage of a web-extension API called [`filterResponseData`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/filterResponseData) that's available nowhere else but Firefox. The API is the key to strip everything but the content before passes it to the renderer.
+This plugin only works in Firefox due to the usage of a web-extension API called [`filterResponseData`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/filterResponseData) that's available nowhere else but Firefox. This API is the key to strip everything but the content before passes it to the renderer.
 
 ## Download extension
 https://addons.mozilla.org/en-US/firefox/addon/medium-unplugged/
@@ -44,7 +44,7 @@ https://extensionworkshop.com/documentation/develop/developing-extensions-for-fi
 
 It's quite complicated to setup, but just follow the instructions laid out in the guide above and you should be fine.
 
-Side note: you don't need to install the whole 'Android Studio' software meant for a full-blown native-app development. You just need the `sdkmanager` for what's at hand.
+Side note: you don't need to install the whole 'Android Studio' software meant for a full-blown native-app development- You just need the `sdkmanager` for what's at hand.
 
 ## Build
 
