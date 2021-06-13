@@ -1,6 +1,6 @@
 # Medium Unplugged :fishing_pole_and_fish:
 
-A Medium article is heavily loaded with Javascript that negatively affects the loading and reading experience of an end-user particularly those on constrained devices. To fix this situation, this Firefox browser plugin strips it to utmost minimum: The content.
+A Medium article is heavily loaded with Javascript that negatively affects the loading and reading experience of an end-user particularly those on constrained devices. To fix this situation, this Firefox browser plugin strips to its utmost minimum: The content.
 
 This plugin only works in Firefox due to the usage of a web-extension API called [`filterResponseData`](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/filterResponseData) that's available nowhere else but Firefox. This API is the key to strip everything but the content before passes it to the renderer.
 
