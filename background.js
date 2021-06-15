@@ -182,6 +182,18 @@ browser.webRequest.onBeforeRequest.addListener(
 
       const article = $("article", html);
 
+      const url = new URL(details.url);
+      let profileUrl = url.origin;
+      let rssUrl = `${url.origin}/feed`;
+
+      // special handling old medium url- medium.com/@username/article_path_12344
+      const [oldMediumHandler, oldArticlePath] = url.pathname
+        .split("/")
+        .filter(Boolean);
+      if (oldArticlePath) {
+        profileUrl = `${url.origin}/${oldMediumHandler}`;
+        rssUrl = `${url.origin}/feed/${oldMediumHandler}`;
+      }
       // get the element of an article's title
       const headline = $("h1", article);
 
@@ -209,7 +221,7 @@ browser.webRequest.onBeforeRequest.addListener(
       const authorName = document.createElement("a");
       authorName.textContent = avatar.getAttribute("alt");
       // set href to point to author's medium page
-      authorName.href = new URL(details.url).origin;
+      authorName.href = profileUrl;
 
       const requestPathname = urlPathname(details.url);
 
@@ -221,7 +233,23 @@ browser.webRequest.onBeforeRequest.addListener(
       postedAtDate.className = "mu-post-date";
 
       const profileCont = document.createElement("div");
-      profileCont.style.cssText = `display: flex; align-items: center`;
+      profileCont.style.display = "flex";
+
+      const rssIcon = document.createElement("a");
+      rssIcon.href = rssUrl;
+      rssIcon.innerHTML = DOMPurify.sanitize(`
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 8 8" style="margin: 4px 0 0 12px">
+          <title xmlns="http://www.w3.org/2000/svg">RSS feed icon</title>
+          <style xmlns="http://www.w3.org/2000/svg" type="text/css">
+            .button {stroke: none; fill: orange;}
+            .symbol {stroke: none; fill: white;}
+          </style>
+          <rect xmlns="http://www.w3.org/2000/svg" class="button" width="8" height="8" rx="1.5"/>
+          <circle xmlns="http://www.w3.org/2000/svg" class="symbol" cx="2" cy="6" r="1"/>
+          <path xmlns="http://www.w3.org/2000/svg" class="symbol" d="m 1,4 a 3,3 0 0 1 3,3 h 1 a 4,4 0 0 0 -4,-4 z"/>
+          <path xmlns="http://www.w3.org/2000/svg" class="symbol" d="m 1,2 a 5,5 0 0 1 5,5 h 1 a 6,6 0 0 0 -6,-6 z"/>
+        </svg>
+      `);
 
       const authorInfoCont = document.createElement("div");
       authorInfoCont.appendChild(authorName);
@@ -229,6 +257,7 @@ browser.webRequest.onBeforeRequest.addListener(
 
       profileCont.appendChild(avatar);
       profileCont.appendChild(authorInfoCont);
+      profileCont.appendChild(rssIcon);
 
       // remove all the action buttons- share post, bookmark etc.
       removeElement($("div", metaDataCont));
