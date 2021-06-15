@@ -209,11 +209,7 @@ browser.webRequest.onBeforeRequest.addListener(
       const authorName = document.createElement("a");
       authorName.textContent = avatar.getAttribute("alt");
       // set href to point to author's medium page
-      authorName.href = avatar
-        .closest("a")
-        .href.replace(/moz-extension:\/\/.+(\/.+)\?source=.+/, function (a, b) {
-          return b; // the matched group in the bracket
-        });
+      authorName.href = new URL(details.url).origin;
 
       const requestPathname = urlPathname(details.url);
 
