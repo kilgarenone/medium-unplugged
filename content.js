@@ -110,7 +110,7 @@ worker.onmessage = async ({ data }) => {
 
   // insert src to elements as data-src for lazy-loading via IntersectionObserver
   data.forEach(({ iFrameSrc, iFrameRef, order, height, width }) => {
-    paragraphs[order].insertBefore(loadingEle, paragraphs[order].firstChild);
+    paragraphs[order].appendChild(loadingEle);
 
     // for gist
     if (iFrameRef) {
@@ -129,14 +129,11 @@ worker.onmessage = async ({ data }) => {
     iframe.addEventListener("load", function () {
       // Hide the loading indicator
       this.parentNode.getElementsByClassName("loading")[0].remove();
-
-      // Bring the iframe back
-      this.style.opacity = 1;
     });
     iframe.setAttribute("data-src", iFrameSrc);
     iframe.width = width;
     iframe.height = height;
-    iframe.style.cssText = `opacity: 0; transition: 0.3s opacity; position: absolute; width: 100%; height: 100%; top: 0; left: 0`;
+    iframe.style.cssText = `position: absolute; width: 100%; height: 100%; top: 0; left: 0`;
 
     const aspectRatio = `${((height / width) * 100).toPrecision(4)}`;
     paragraphs[
